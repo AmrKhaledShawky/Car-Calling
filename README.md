@@ -1,16 +1,188 @@
-# React + Vite
+# 🚗 Car Calling Platform – Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A multi-role car rental web application built with React.
 
-Currently, two official plugins are available:
+This platform allows tenants to rent cars, landlords to list vehicles, delivery personnel to manage deliveries, and admins to manage the entire system.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+This repository contains the **frontend application only**.
 
-## React Compiler
+---
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## 📌 Project Overview
 
-## Expanding the ESLint configuration
+Car Calling is a role-based car rental platform that supports:
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+- Visitors (browse only)
+- Tenants (rent cars)
+- Landlords (list cars)
+- Delivery Personnel
+- Admins
+- Premium Users
+
+The system is designed with scalability, modularity, and clean architecture in mind.
+
+---
+
+## 🏗️ Tech Stack
+
+- React (Vite)
+- React Router DOM
+- Context API (Authentication & Role Management)
+- Axios (API communication)
+- TailwindCSS (optional styling)
+- JavaScript (ES6+)
+
+---
+
+## 📁 Project Structure
+
+```
+src/
+│
+├── app/
+├── assets/
+├── components/
+├── context/
+├── hooks/
+├── pages/
+├── routes/
+├── services/
+└── utils/
+```
+
+The project follows a feature-based and role-based architecture to support growth and maintainability.
+
+---
+
+## 👥 System User Roles
+
+### 🔹 Visitor
+- Browse available cars
+- View car details
+- Cannot rent cars
+
+### 🔹 Tenant
+- Complete profile verification
+- Search and filter cars
+- Schedule rentals
+- Apply promo codes
+- Upload car condition photos (before/after)
+- Chat with car owners
+- Manage rentals
+- Subscribe to premium
+
+### 🔹 Landlord
+- Add cars
+- Manage listings
+- Track cars
+- Block users
+- View rental requests
+
+### 🔹 Delivery Personnel
+- View assigned deliveries
+- Upload before/after delivery photos
+
+### 🔹 Admin
+- View analytics dashboard
+- Manage users
+- View reports
+- Send system notifications
+
+---
+
+## 🔐 Authentication & Security
+
+- Role-based routing
+- Protected routes
+- Password complexity validation
+- Account lock after multiple failed login attempts
+- Verification required before renting or listing cars
+- Payment method required before rental
+
+---
+
+## 🚀 Getting Started
+
+### 1️⃣ Clone the Repository
+
+```bash
+git clone https://github.com/YOUR_USERNAME/car-calling-frontend.git
+cd car-calling-frontend
+```
+
+### 2️⃣ Install Dependencies
+
+```bash
+npm install
+```
+
+### 3️⃣ Start Development Server
+
+```bash
+npm run dev
+```
+
+---
+
+## 🛣️ Routing Structure
+
+- `/` → Public pages
+- `/auth/*` → Authentication pages
+- `/tenant/*` → Tenant dashboard
+- `/landlord/*` → Landlord dashboard
+- `/delivery/*` → Delivery dashboard
+- `/admin/*` → Admin dashboard
+
+---
+
+## 👨‍💻 Team Members
+
+| Name                          | Role in Project |
+|-------------------------------|------------------|
+| Amr Khaled Mohamed Shawky     | __________________________ |
+| Maryam Gomaa                  | __________________________ |
+| Hoda Mahmoud                  | __________________________ |
+| Jowairya Kassem               | __________________________ |
+| Basmala Elkady                | __________________________ |
+
+---
+
+## 🎯 Development Roadmap
+
+### Phase 1
+- Project setup
+- Routing structure
+- Authentication UI
+
+### Phase 2
+- Car browsing
+- Tenant rental flow
+
+### Phase 3
+- Landlord dashboard
+- Admin panel
+
+### Phase 4
+- Chat system
+- Delivery system
+- Premium features
+
+---
+
+## 📌 Future Improvements
+
+- Real-time chat with WebSockets
+- Advanced analytics dashboard
+- Payment integration (Stripe/PayPal)
+- Mobile responsiveness optimization
+- Progressive Web App (PWA) support
+
+---
+
+## 📄 License
+
+This project is for educational and development purposes.
+
+---
+
+🔥 Built with scalability and clean architecture in mind.
