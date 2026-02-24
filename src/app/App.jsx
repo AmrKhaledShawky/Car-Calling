@@ -1,5 +1,7 @@
+import Router from "./router";
+
 function App() {
-  return <h1>Car Calling Project</h1>;
+  return <Router />;
 }
 
 export default App;
