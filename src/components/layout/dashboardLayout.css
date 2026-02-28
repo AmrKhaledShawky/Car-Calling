@@ -1,0 +1,18 @@
+.dashboard-container {
+  display: flex;
+}
+
+.dashboard-content {
+  margin-left: 250px;
+  width: calc(100% - 250px);
+  transition: all 0.3s ease;
+}
+
+.dashboard-content.collapsed {
+  margin-left: 80px;
+  width: calc(100% - 80px);
+}
+
+.dashboard-page {
+  padding: 30px 40px;
+}
