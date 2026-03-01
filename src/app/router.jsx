@@ -5,12 +5,14 @@ import MyCars from "../pages/landlord/MyCars";
 import RentalRequests from "../pages/landlord/RentalRequests";
 import Settings from "../pages/landlord/Settings";
 import Profile from "../pages/landlord/Profile";
+import Register from "../pages/auth/Register";
 function Router() {
   return (
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<h1>Home Page</h1>} />
         <Route path="/login" element={<Login />} />
+        <Route path="/auth/register" element={<Register />} />
         <Route path="/landlord/dashboard" element={<LandlordDashboard />} />
         <Route path="/landlord/my-cars" element={<MyCars />} />
         <Route path="/landlord/rental-requests" element={<RentalRequests />} />
