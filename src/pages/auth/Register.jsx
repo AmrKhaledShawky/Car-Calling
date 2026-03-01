@@ -22,23 +22,22 @@ export default function Registration() {
 
   return (
     <div className="main-wrapper">
+      {/* TOP NAV */}
+      <div className="top-nav">
+        <div className="links">
+          <span>About CarCalling</span>
+          <span>Contact Us</span>
+          <span>FAQ</span>
+        </div>
+      </div>
 
-      {/* 🔥 TOP NAVIGATION */}
-  <div className="top-nav">
-  <div className="links">
-    <span>About CarCalling</span>
-    <span>Contact Us</span>
-    <span>FAQ</span>
-    </div>
-    </div>
-      {/* LEFT SIDE: form */}
+      {/* LEFT SIDE */}
       <div className="left-side">
         <h1>
           CarCalling <span>.....</span>
         </h1>
 
         <form className="form-grid">
-          {/* Full Name */}
           <div className="field">
             <label>Full Name</label>
             <div className="input-wrapper">
@@ -53,7 +52,6 @@ export default function Registration() {
             </div>
           </div>
 
-          {/* Email */}
           <div className="field">
             <label>Email</label>
             <div className="input-wrapper">
@@ -68,7 +66,6 @@ export default function Registration() {
             </div>
           </div>
 
-          {/* Phone Number */}
           <div className="field">
             <label>Phone Number</label>
             <div className="input-wrapper">
@@ -83,7 +80,6 @@ export default function Registration() {
             </div>
           </div>
 
-          {/* Country */}
           <div className="field">
             <label>Country</label>
             <div className="input-wrapper">
@@ -98,7 +94,6 @@ export default function Registration() {
             </div>
           </div>
 
-          {/* City */}
           <div className="field">
             <label>City</label>
             <div className="input-wrapper">
@@ -113,7 +108,6 @@ export default function Registration() {
             </div>
           </div>
 
-          {/* Password */}
           <div className="field">
             <label>Password</label>
             <div className="input-wrapper">
@@ -128,7 +122,6 @@ export default function Registration() {
             </div>
           </div>
 
-          {/* Confirm Password */}
           <div className="field full-width">
             <label>Confirm Password</label>
             <div className="input-wrapper">
@@ -142,7 +135,6 @@ export default function Registration() {
             </div>
           </div>
 
-          {/* Gender */}
           <div className="gender-row full-width">
             <label>
               <input
@@ -167,24 +159,21 @@ export default function Registration() {
             </label>
           </div>
 
-          {/* Submit */}
           <button type="submit" className="submit-btn">
             Pick Up
           </button>
 
-          {/* Already have account */}
           <div className="already">
-            Already have an account? <a href="#">Sign in</a>
+            Already have an account? <a href="/login">Sign in</a>
           </div>
         </form>
       </div>
 
       {/* RIGHT SIDE */}
-      <div className="right-side half-circle-bg">
+      <div className="right-side">
         <div className="circle-bg"></div>
         <img src={carImage} alt="Car" className="car-image" />
       </div>
-
     </div>
   );
 }

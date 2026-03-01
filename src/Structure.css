@@ -1,31 +1,154 @@
-/* reset */
+/* RESET */
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
+/* IMPORTANT: DO NOT BLOCK GLOBAL SCROLL */
 html, body {
-  height: 100%;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-  background: #f0f0f0;
+  min-height: 100%;
+  overflow-x: hidden;
+  overflow-y: auto;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background: #ededed;
   color: #222;
 }
 
-/* ────────────────────────────────────────
-   CONTAINER
-───────────────────────────────────────── */
+/* MAIN WRAPPER */
 .main-wrapper {
-  min-height: 100vh;
+  height: 100vh;        /* lock to screen */
   display: flex;
   position: relative;
-  overflow: hidden;
-  background: #ededed;
+  overflow: hidden;     /* THIS STOPS HALF CIRCLE PUSH */
 }
 
-/* ────────────────────────────────────────
-   RIGHT SIDE ── big white circle + car
-───────────────────────────────────────── */
+/* TOP NAV */
+.top-nav {
+  position: absolute;
+  top: 20px;
+  left: 60px;
+  right: 60px;
+  display: flex;
+  justify-content: flex-end;
+  z-index: 10;
+  font-weight: 600;
+}
+
+.top-nav .links {
+  display: flex;
+  gap: 40px;
+}
+
+.top-nav .links span:hover {
+  color: #6B0202;
+  cursor: pointer;
+}
+
+/* LEFT SIDE */
+.left-side {
+  flex: 1;
+  max-width: 620px;
+  padding: 20px 60px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  z-index: 5;
+}
+
+h1 {
+  font-size: 30px;
+  font-weight: 800;
+}
+
+h1 span {
+  color: #6B0202;
+}
+
+/* FORM GRID */
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 22px 30px;
+  margin-top: 20px;
+}
+
+.full-width {
+  grid-column: 1 / -1;
+}
+
+.field label {
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 4px;
+  display: block;
+}
+
+/* INPUTS */
+.input-wrapper {
+  position: relative;
+}
+
+.input-wrapper input {
+  width: 100%;
+  padding: 10px 10px 10px 36px;
+  font-size: 14px;
+  border: none;
+  border-bottom: 2px solid #444;
+  background: transparent;
+  transition: 0.2s;
+}
+
+.input-wrapper input:focus {
+  border-bottom-color: #6B0202;
+  outline: none;
+}
+
+.input-icon {
+  position: absolute;
+  left: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #6B0202;
+}
+
+/* GENDER */
+.gender-row {
+  display: flex;
+  gap: 30px;
+  margin-top: 8px;
+}
+
+input[type="radio"] {
+  accent-color: #6B0202;
+}
+
+/* BUTTON */
+.submit-btn {
+  grid-column: 1 / -1;
+  margin-top: 20px;
+  padding: 14px 0;
+  font-size: 16px;
+  font-weight: 700;
+  color: white;
+  background: #6B0202;
+  border: none;
+  border-radius: 60px;
+  cursor: pointer;
+}
+
+.submit-btn:hover {
+  background: #e00;
+}
+
+.already {
+  grid-column: 1 / -1;
+  text-align: center;
+  margin-top: 16px;
+  font-size: 14px;
+}
+
+/* RIGHT SIDE */
 .right-side {
   flex: 1;
   position: relative;
@@ -36,260 +159,62 @@ html, body {
 
 .circle-bg {
   position: absolute;
-  width: 1100px;
-  height: 1100px;
+  width: 1000px;
+  height: 1000px;
   background: white;
   border-radius: 50%;
-  right: -380px;
-  top: -280px;
-  z-index: 1;
+  right: -350px;
+  top: -250px;
 }
 
 .car-image {
   position: relative;
-  z-index: 3;
-  width: 92%;
-  max-width: 960px;
-  filter: drop-shadow(0 40px 40px rgba(0,0,0,0.35));
-  transform: translateY(-40px) translateX(-60px);
+  width: 85%;
+  max-width: 850px;
+  filter: drop-shadow(0 30px 30px rgba(0,0,0,0.35));
 }
 
-/* ────────────────────────────────────────
-   LEFT SIDE ── form
-───────────────────────────────────────── */
-.left-side {
-  flex: 1;
-  max-width: 620px;
-  padding: 40px 70px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  z-index: 5;
-  background: rgba(255,255,255, 0.06);
-  backdrop-filter: blur(8px);
-}
-
-/* Title */
-h1 {
-  font-size: 34px;
-  font-weight: 800;
-  color: #000;
-  margin-bottom: 6px;
-  letter-spacing: -0.5px;
-}
-
-h1 span {
-  color: #6B0202;
-}
-
-/* ────────────────────────────────────────
-   FORM GRID (2 columns)
-───────────────────────────────────────── */
-.form-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 28px 36px;
-  margin-top: 32px;
-}
-
-.form-grid .full-width {
-  grid-column: 1 / -1;
-}
-
-/* Field wrapper */
-.field {
-  position: relative;
-}
-
-.field label {
-  font-size: 13.5px;
-  font-weight: 600;
-  color: #333;
-  margin-bottom: 6px;
-  display: block;
-}
-
-/* Input with icon on left */
-.input-wrapper {
-  position: relative;
-}
-
-.input-wrapper input,
-.input-wrapper select {
-  width: 100%;
-  padding: 12px 12px 12px 38px;
-  font-size: 15px;
-  border: none;
-  border-bottom: 2px solid #444;
-  background: transparent;
-  transition: border-color 0.18s;
-}
-
-.input-wrapper input:focus,
-.input-wrapper select:focus {
-  border-bottom-color: #6B0202;
-  outline: none;
-}
-
-.input-icon {
-  position: absolute;
-  left: 8px;
-  top: 50%;
-  transform: translateY(-52%);
-  font-size: 19px;
-  color: #6B0202;
-}
-
-/* Gender */
-.gender-row {
-  grid-column: 1 / -1;
-  margin-top: 12px;
-  display: flex;
-  align-items: center;
-  gap: 48px;
-}
-
-.gender-row label {
-  font-size: 14.5px;
-  font-weight: 500;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-input[type="radio"] {
-  accent-color: #6B0202;
-  width: 18px;
-  height: 18px;
-}
-
-/* Button */
-.submit-btn {
-  grid-column: 1 / -1;
-  margin-top: 28px;
-  padding: 16px 0;
-  font-size: 17px;
-  font-weight: 700;
-  color: white;
-  background: #6B0202;
-  border: none;
-  border-radius: 60px;
-  cursor: pointer;
-  transition: background 0.2s;
-}
-
-.submit-btn:hover {
-  background: #e00;
-}
-
-/* Already have account */
-.already {
-  grid-column: 1 / -1;
-  text-align: center;
-  margin-top: 24px;
-  font-size: 14.5px;
-  color: #444;
-}
-
-.already a {
-  color: #6B0202;
-  font-weight: 600;
-  text-decoration: none;
-}
-
-.already a:hover {
-  text-decoration: underline;
-}
-
-/* ────────────────────────────────────────
-   TOP NAVIGATION
-───────────────────────────────────────── */
-.top-nav {
-  position: absolute;
-  top: 28px;
-  left: 60px;
-  right: 60px; 
-  display: flex;
-  justify-content: flex-end; 
-  align-items: center;
-  z-index: 10;
-  font-weight: 600;
-  color: #000;
-}
-
-.top-nav .logo {
-  font-size: 26px;
-  font-weight: 800;
-}
-
-.top-nav .logo span {
-  color: #6B0202;
-}
-
-.top-nav .links {
-  display: flex;
-  gap: 40px; 
-}
-.top-nav .links span:hover {
-  color: #6B0202;
-}
-
-/* ────────────────────────────────────────
-   Mobile / smaller screens
-───────────────────────────────────────── */
+/* TABLET */
 @media (max-width: 1024px) {
   .form-grid {
     grid-template-columns: 1fr;
   }
-  .left-side {
-    padding: 40px 40px;
-  }
+
   .circle-bg {
-    right: -450px;
-    top: -350px;
+    width: 700px;
+    height: 700px;
+    right: -250px;
+    top: -200px;
   }
-  .car-image {
-    transform: translateY(-20px) translateX(-40px);
-  }
-/* Right side as half white circle on gray background */
-.right-side.half-circle-bg {
-  flex: 1;
-  position: relative;
-  background: #444; 
-  display: flex;
-  justify-content: flex-end; 
-  align-items: center;
-  overflow: hidden;
 }
 
-/*Big White Circle*/
-.right-side .circle-bg {
-  position: absolute;
-  width: 600px;         
-  height: 70%;           
-  background: white;
-  border-radius: 50%;
-  right: -300px;        
-  top: 0;               
-  z-index: 1;
-}
+/* MOBILE */
+@media (max-width: 768px) {
 
-.right-side .car-image {
-  position: absolute; 
-  z-index: 2;
-  width: 50%;
-  max-width: 450px;
-  right: 0;            
-  top: 50%;            
-  transform: translateY(-50%); 
-  margin: 0;           
-  padding: 0;  
-   position: absolute;
-  right: 0;
-  top: 50%;
-  transform: translateY(-50%);
-  margin: 0;
-  padding: 0;
-}
+  .right-side {
+    display: none;
+  }
+
+  .main-wrapper {
+    flex-direction: column;
+  }
+
+  .left-side {
+    max-width: 100%;
+    padding: 20px 30px;
+  }
+
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  h1 {
+    font-size: 24px;
+  }
+
+  .top-nav {
+    position: static;
+    justify-content: center;
+    margin-bottom: 15px;
+  }
 }
