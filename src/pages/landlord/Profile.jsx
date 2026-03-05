@@ -1,17 +1,33 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import DashboardLayout from "../../components/layout/DashboardLayout";
 import toast from "react-hot-toast";
 import "./profile.css";
 
 export default function Profile() {
   const [formData, setFormData] = useState({
-    name: "Black Goast",
-    email: "H4cker@email.com",
-    phone: "+20 123456789",
-    company: "Car Calling Rentals"
+    name: "",
+    email: "",
+    phone: "",
+    company: ""
   });
 
   const [photo, setPhoto] = useState(null);
+
+  // load from localStorage if available
+  useEffect(() => {
+    const stored = localStorage.getItem("user");
+    if (stored) {
+      const u = JSON.parse(stored);
+      setFormData((prev) => ({
+        ...prev,
+        name: u.name || "",
+        email: u.email || "",
+        phone: u.phone || "",
+        company: u.company || ""
+      }));
+      if (u.photo) setPhoto(u.photo);
+    }
+  }, []);
 
   const handleChange = (e) => {
     setFormData({
@@ -21,6 +37,17 @@ export default function Profile() {
   };
 
   const handleSave = () => {
+    // store in localStorage so topbar can read the name
+    const userData = {
+      name: formData.name,
+      role: "Landlord",
+      email: formData.email,
+      phone: formData.phone,
+      company: formData.company,
+      photo
+    };
+    localStorage.setItem("user", JSON.stringify(userData));
+
     console.log("Profile Saved:", formData);
 
     toast.success("Profile updated successfully!");

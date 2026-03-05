@@ -7,10 +7,18 @@ import {
   LogOut,
   Menu
 } from "lucide-react";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import "./sidebar.css";
 
 export default function Sidebar({ collapsed, setCollapsed }) {
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    // clear any stored user/session data
+    localStorage.removeItem("user");
+    // navigate to login page
+    navigate("/login");
+  };
 
   return (
     <div className={`sidebar ${collapsed ? "collapsed" : ""}`}>
@@ -45,7 +53,7 @@ export default function Sidebar({ collapsed, setCollapsed }) {
         </NavLink>
       </nav>
 
-      <div className="sidebar-logout">
+      <div className="sidebar-logout" onClick={handleLogout}>
         <LogOut size={18} />
         <span>Logout</span>
       </div>
