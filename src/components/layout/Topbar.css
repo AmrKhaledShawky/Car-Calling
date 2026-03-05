@@ -13,3 +13,19 @@
   gap: 20px;
   cursor: pointer;
 }
+
+.topbar-identity {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
+}
+
+.topbar-identity h2 {
+  margin: 0;
+  font-size: 18px;
+}
+
+.topbar-role {
+  font-size: 12px;
+  color: #666;
+}

@@ -28,6 +28,7 @@
 .cars-table {
   width: 100%;
   border-collapse: collapse;
+  table-layout: fixed; /* keep column widths consistent regardless of content */
 }
 
 .cars-table th,
@@ -66,6 +67,7 @@
   display: flex;
   gap: 12px;
   cursor: pointer;
+  align-items: center; /* vertically center within row */
 }
 
 .edit-icon {
@@ -86,18 +88,24 @@
   align-items: center;
   justify-content: center;
   z-index: 1000;
+  padding: 20px; /* ensure some spacing on small screens */
+  overflow-y: auto; /* allow scrolling when modal is taller than viewport */
 }
 
 /* Card */
 .modal-card {
   background: white;
-  width: 500px;
-  max-width: 95%;
+  width: 100%;
+  max-width: 800px;
+  min-width: 500px; /* ensure it's not too narrow */
   border-radius: 16px;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
   animation: fadeIn 0.25s ease;
   display: flex;
   flex-direction: column;
+  max-height: 90vh;
+  overflow-y: auto;
+  padding-bottom: 10px; /* additional spacing below content */
 }
 
 /* Header */
@@ -118,37 +126,43 @@
 
 /* Body */
 .modal-body {
-  padding: 25px;
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 20px;
+  gap: 18px 22px;
+  padding: 20px 25px; /* give some breathing room around form fields */
 }
 
 .form-group {
   display: flex;
   flex-direction: column;
-  gap: 6px;
 }
 
 .form-group label {
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 600;
-  color: #555;
+  margin-bottom: 6px;
 }
 
 .form-group input,
-.form-group select {
-  padding: 10px;
+.form-group select,
+.form-group textarea {
+  width: 100%;
+  padding: 10px 12px;
   border-radius: 8px;
-  border: 1px solid #ddd;
+  border: 1px solid #d9d9d9;
   font-size: 14px;
-  transition: 0.2s;
 }
 
-.form-group input:focus,
-.form-group select:focus {
-  border-color: #6B0202;
-  outline: none;
+.form-group textarea {
+  resize: none;
+  height: 80px;
+}
+
+/* Responsive behavior */
+@media (max-width: 768px) {
+  .modal-body {
+    grid-template-columns: 1fr;
+  }
 }
 
 /* Footer */
@@ -205,4 +219,32 @@
 
 .delete-confirm-btn:hover {
   background: #b71c1c;
+}
+
+.form-group.image-upload {
+  grid-column: span 2;
+}
+
+.cars-table th:first-child,
+.cars-table td:first-child {
+  width: 80px;
+}
+
+.cars-table img,
+.car-thumb {
+  width: 60px;
+  height: 40px;
+  object-fit: cover;
+  border-radius: 6px;
+  display: block; /* remove inline-block baseline spacing issues */
+}
+
+.cars-table td {
+  vertical-align: middle;
+}
+
+.cars-table td.actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
 }
