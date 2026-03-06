@@ -1,0 +1,37 @@
+.admin-topbar {
+  display: flex; 
+  align-items: center;
+  justify-content: space-between; 
+  padding: 0 30px; 
+  background-color: rgb(204, 204, 204); 
+  border-bottom: 1px solid #ddd; 
+  width: 100%; 
+  box-sizing: border-box; 
+  margin: 0; 
+  position: fixed; 
+  top: 0; 
+  left: 0; 
+  z-index: 1000; 
+  height: 60px;  
+}
+
+.admin-title {
+  font-size: 1.50rem;   
+  font-weight: bold;    
+  color: #000;          
+}
+
+.admin-icon {
+  font-size: 2rem;      
+  cursor: pointer;      
+  color: #000;
+  transition: color 0.2s ease;
+  margin: 10px;
+}
+
+.admin-icon:hover {
+  color: #6B0202;           
+}
+body { 
+  padding-top: 60px;  
+}

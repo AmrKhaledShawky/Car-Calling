@@ -7,6 +7,8 @@ import Settings from "../pages/landlord/Settings";
 import Profile from "../pages/landlord/Profile";
 import Register from "../pages/auth/Register";
 import Privacy from "../pages/Privacy";
+import AdminDashboard from "../pages/admin/Admindashboard";
+import AdminProfile from "../pages/admin/adminProfile";
 function Router() {
   return (
     <BrowserRouter>
@@ -20,6 +22,9 @@ function Router() {
         <Route path="/landlord/rental-requests" element={<RentalRequests />} />
         <Route path="/landlord/settings" element={<Settings />} />
         <Route path="/landlord/profile" element={<Profile />} />
+        <Route path="/admin/dashboard" element={<AdminDashboard />} />
+        <Route path="/admin/profile" element={<AdminProfile />} />
+       
       </Routes>
     </BrowserRouter>
   );

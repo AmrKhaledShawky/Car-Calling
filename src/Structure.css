@@ -17,39 +17,17 @@ html, body {
 
 /* MAIN WRAPPER */
 .main-wrapper {
-  height: 100vh;        /* lock to screen */
+  height: 100vh;
   display: flex;
   position: relative;
-  overflow: hidden;     /* THIS STOPS HALF CIRCLE PUSH */
-}
-
-/* TOP NAV */
-.top-nav {
-  position: absolute;
-  top: 20px;
-  left: 60px;
-  right: 60px;
-  display: flex;
-  justify-content: flex-end;
-  z-index: 10;
-  font-weight: 600;
-}
-
-.top-nav .links {
-  display: flex;
-  gap: 40px;
-}
-
-.top-nav .links span:hover {
-  color: #6B0202;
-  cursor: pointer;
+  overflow: hidden;
 }
 
 /* LEFT SIDE */
 .left-side {
   flex: 1;
   max-width: 620px;
-  padding: 20px 60px;
+  padding: 40px 60px;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -112,15 +90,46 @@ h1 span {
   color: #6B0202;
 }
 
+/* FIELD TITLES ABOVE OPTIONS */
+.field-title {
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 6px;
+  display: block;
+}
+
 /* GENDER */
 .gender-row {
   display: flex;
-  gap: 30px;
+  flex-direction: row;
+  gap: 60px;
   margin-top: 8px;
 }
 
+.gender-options {
+  display: flex;
+  gap: 60px; /* المسافة بين Male و gender */
+  margin-top: 5px;
+}
+
+/* ROLE */
+.role-row {
+  display: flex;
+  flex-direction: row;
+  gap: 40px; 
+  margin-top: 8px;
+}
+
+.role-options {
+  display: flex;
+  gap: 50px; /* المسافة بين Tenant و Landlord */
+  margin-top: 5px;
+}
+
+/* RADIO STYLE */
 input[type="radio"] {
   accent-color: #6B0202;
+  margin-right: 6px;
 }
 
 /* BUTTON */
@@ -211,10 +220,7 @@ input[type="radio"] {
   h1 {
     font-size: 24px;
   }
-
-  .top-nav {
-    position: static;
-    justify-content: center;
-    margin-bottom: 15px;
-  }
+  .role-options input[type="radio"] {
+  margin-right: 6px;
+}
 }

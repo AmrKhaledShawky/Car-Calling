@@ -1,0 +1,79 @@
+/* Sidebar container */
+.admin-sidebar {
+  background-color: #000; 
+  color: white;     /*text color*/   
+  min-height: 100vh;
+  width: 250px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  transition: width 0.3s ease;
+}
+
+
+.admin-sidebar.collapsed {
+  width: 70px;
+}
+
+/* Toggle button */
+.admin-sidebar-toggle {
+  display: flex;
+  flex-direction: column; 
+  align-items: center;
+  cursor: pointer;
+  margin-bottom: 20px;
+}
+
+.toggle-icon {
+  font-size: 24px;
+  color: white;
+  margin-bottom: 8px;
+}
+
+/* CarCalling title */
+.admin-sidebar-title {
+  color: #6B0202;          
+  font-weight: bold;
+  font-size: 2.1rem;
+  text-align: center;
+}
+
+/* Menu items container */
+.admin-sidebar-menu {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* Each menu item */
+.admin-sidebar-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px;
+  border-radius: 6px;
+  color: white;         
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+/* Icon in menu item */
+.admin-sidebar-icon {
+  font-size: 18px;
+}
+
+/* Text in menu item */
+.admin-sidebar-text {
+  font-size: 1rem;
+}
+
+/* Hover effect */
+.admin-sidebar-item:hover {
+  background-color: #222; /* لون أغمق عند hover */
+  color: #6B0202;             /* النص يصبح أحمر عند hover */
+}
+
+/* Active menu item */
+.admin-sidebar-item.active {
+  color: #6B0202;             /* العنصر الحالي باللون الأحمر */
+  font-weight: bold;
+}

@@ -4,6 +4,7 @@ import carImage from "../../assets/RegCar.png";
 import "../../Structure.css";
 
 export default function Registration() {
+
   const [formData, setFormData] = useState({
     fullName: "",
     email: "",
@@ -13,6 +14,7 @@ export default function Registration() {
     password: "",
     confirmPassword: "",
     gender: "male",
+    role: "tenant",
   });
 
   const handleChange = (e) => {
@@ -22,14 +24,6 @@ export default function Registration() {
 
   return (
     <div className="main-wrapper">
-      {/* TOP NAV */}
-      <div className="top-nav">
-        <div className="links">
-          <span>About CarCalling</span>
-          <span>Contact Us</span>
-          <span>FAQ</span>
-        </div>
-      </div>
 
       {/* LEFT SIDE */}
       <div className="left-side">
@@ -38,6 +32,7 @@ export default function Registration() {
         </h1>
 
         <form className="form-grid">
+
           <div className="field">
             <label>Full Name</label>
             <div className="input-wrapper">
@@ -135,8 +130,10 @@ export default function Registration() {
             </div>
           </div>
 
+          {/* Gender */}
           <div className="gender-row full-width">
-            <label>
+             <label className="field-title">Gender</label>
+            <label> 
               <input
                 type="radio"
                 name="gender"
@@ -159,6 +156,34 @@ export default function Registration() {
             </label>
           </div>
 
+          {/* Role */}
+   <div className="role-row full-width">
+  <label className="field-title">User Role</label>
+
+  <div className="role-options">
+    <label>
+      <input
+        type="radio"
+        name="role"
+        value="tenant"
+        checked={formData.role === "tenant"}
+        onChange={handleChange}
+      />
+      Tenant
+    </label>
+
+    <label>
+      <input
+        type="radio"
+        name="role"
+        value="landlord"
+        checked={formData.role === "landlord"}
+        onChange={handleChange}
+      />
+      Landlord
+    </label>
+  </div>
+</div>
           <button type="submit" className="submit-btn">
             Pick Up
           </button>
@@ -166,6 +191,7 @@ export default function Registration() {
           <div className="already">
             Already have an account? <a href="/login">Sign in</a>
           </div>
+
         </form>
       </div>
 
@@ -174,6 +200,7 @@ export default function Registration() {
         <div className="circle-bg"></div>
         <img src={carImage} alt="Car" className="car-image" />
       </div>
+
     </div>
   );
 }
