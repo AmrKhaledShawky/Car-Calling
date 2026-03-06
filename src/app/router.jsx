@@ -6,12 +6,13 @@ import RentalRequests from "../pages/landlord/RentalRequests";
 import Settings from "../pages/landlord/Settings";
 import Profile from "../pages/landlord/Profile";
 import Register from "../pages/auth/Register";
-import Privacy from "../pages/Privacy";
+import Privacy from "../pages/privacy";
+import LandingPage from "../pages/LandingPage/LandingPage";
 function Router() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<h1>Home Page</h1>} />
+        <Route path="/" element={<LandingPage />} />
         <Route path="/login" element={<Login />} />
         <Route path="/auth/register" element={<Register />} />
         <Route path="/privacy" element={<Privacy />} />

@@ -89,16 +89,15 @@ export default function Login() {
         </form>
 
         <p className="signup-text">
-  Don’t Have An Account?{" "}
-  <Link to="/auth/register" className="signup-link">
-    SIGN UP
-  </Link>
-</p>
-        
+          Don’t Have An Account?{" "}
+          <Link to="/auth/register" className="signup-link">
+            SIGN UP
+          </Link>
+        </p>
 
         <div className="footer">
           <span>© Car Calling 2026</span>
-          <Link to="/Privacy" className="privacy">
+          <Link to="/privacy" className="privacy">
             Privacy Policy
           </Link>
         </div>
