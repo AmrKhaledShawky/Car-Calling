@@ -1,0 +1,140 @@
+/* LOGIN PAGE STYLES */
+
+/* LOGIN CONTAINER */
+.login-container {
+  display: flex;
+  height: 100vh;          /* fixed to screen */
+  width: 100%;
+  background-color: #e6e6e6;
+  position: relative;
+  overflow: hidden;       /* THIS IS THE FIX */
+}
+
+/* TOP NAV */
+.login-top-nav {
+  position: absolute;
+  top: 30px;
+  left: 60px;
+  display: flex;
+  align-items: center;
+  z-index: 5;
+}
+
+.logo {
+  font-size: 24px;
+  font-weight: bold;
+  color: black;
+}
+
+.logo span {
+  color: #6B0202;
+}
+
+/* LEFT SIDE */
+.login-left {
+  flex: 1;
+  padding-left: 100px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.login-left h2 {
+  font-size: 26px;
+  margin-bottom: 10px;
+}
+
+.brand {
+  color: #6B0202;
+  font-size: 42px;
+  margin-bottom: 60px;
+}
+
+.input-group {
+  margin-bottom: 35px;
+}
+
+.input-group label {
+  font-weight: 600;
+  color: black;
+  display: block;
+  margin-bottom: 8px;
+}
+
+.input-group input {
+  width: 70%;
+  padding: 12px 5px;
+  border: none;
+  border-bottom: 2px solid #444;
+  background: transparent;
+  outline: none;
+  color: black;
+}
+
+/* BUTTON */
+.login-btn {
+  width: 150px;
+  padding: 14px;
+  background-color: #6B0202;
+  color: white;
+  border: none;
+  border-radius: 50px;
+  font-weight: bold;
+  cursor: pointer;
+  margin-top: 20px;
+}
+
+.login-btn:hover {
+  background-color: #6B0202;
+}
+
+.signup-text {
+  margin-top: 30px;
+}
+
+.signup-text span {
+  color: #6B0202;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+/* RIGHT SIDE */
+.login-right {
+  flex: 1;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.circle {
+  position: absolute;
+  width: 70vw;
+  height: 70vw;
+  background: white;
+  border-radius: 50%;
+  right: -35vw;
+  top: -35vw;
+}
+
+.car-image {
+  position: relative;
+  width: 80%;
+  max-width: 600px;
+  z-index: 2;
+}
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+  .login-left {
+    padding-left: 40px;
+  }
+
+  .input-group input {
+    width: 90%;
+  }
+
+  .login-right {
+    display: none;
+  }
+}

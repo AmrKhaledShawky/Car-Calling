@@ -8,6 +8,7 @@ import Profile from "../pages/landlord/Profile";
 import Register from "../pages/auth/Register";
 import Privacy from "../pages/privacy";
 import LandingPage from "../pages/LandingPage/LandingPage";
+import BrowseCars from "../pages/LandingPage/BrowseCars";
 function Router() {
   return (
     <BrowserRouter>
@@ -21,6 +22,7 @@ function Router() {
         <Route path="/landlord/rental-requests" element={<RentalRequests />} />
         <Route path="/landlord/settings" element={<Settings />} />
         <Route path="/landlord/profile" element={<Profile />} />
+        <Route path="/browse-cars" element={<BrowseCars />} />
       </Routes>
     </BrowserRouter>
   );
