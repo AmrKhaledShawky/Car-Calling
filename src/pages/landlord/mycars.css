@@ -1,0 +1,250 @@
+.mycars-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 25px;
+}
+
+.add-car-btn {
+  background: #6B0202;
+  color: white;
+  border: none;
+  padding: 10px 18px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+}
+
+.cars-table-wrapper {
+  background: white;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.05);
+  overflow-x: auto;
+}
+
+.cars-table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed; /* keep column widths consistent regardless of content */
+}
+
+.cars-table th,
+.cars-table td {
+  padding: 14px;
+  text-align: left;
+}
+
+.cars-table thead {
+  background: #f5f5f5;
+}
+
+.status {
+  padding: 5px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.status.ready {
+  background: #e6f4ea;
+  color: #2e7d32;
+}
+
+.status.rented {
+  background: #fdecea;
+  color: #c62828;
+}
+
+.status.maintenance {
+  background: #fff4e5;
+  color: #ef6c00;
+}
+
+.actions {
+  display: flex;
+  gap: 12px;
+  cursor: pointer;
+  align-items: center; /* vertically center within row */
+}
+
+.edit-icon {
+  color: #6B0202;
+}
+
+.delete-icon {
+  color: #c62828;
+}
+
+/* Overlay */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(3px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px; /* ensure some spacing on small screens */
+  overflow-y: auto; /* allow scrolling when modal is taller than viewport */
+}
+
+/* Card */
+.modal-card {
+  background: white;
+  width: 100%;
+  max-width: 800px;
+  min-width: 500px; /* ensure it's not too narrow */
+  border-radius: 16px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+  animation: fadeIn 0.25s ease;
+  display: flex;
+  flex-direction: column;
+  max-height: 90vh;
+  overflow-y: auto;
+  padding-bottom: 10px; /* additional spacing below content */
+}
+
+/* Header */
+.modal-header {
+  padding: 20px 25px;
+  border-bottom: 1px solid #eee;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.close-btn {
+  background: transparent;
+  border: none;
+  font-size: 18px;
+  cursor: pointer;
+}
+
+/* Body */
+.modal-body {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px 22px;
+  padding: 20px 25px; /* give some breathing room around form fields */
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-group label {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid #d9d9d9;
+  font-size: 14px;
+}
+
+.form-group textarea {
+  resize: none;
+  height: 80px;
+}
+
+/* Responsive behavior */
+@media (max-width: 768px) {
+  .modal-body {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Footer */
+.modal-footer {
+  padding: 20px 25px;
+  border-top: 1px solid #eee;
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.save-btn {
+  background: #6B0202;
+  color: white;
+  border: none;
+  padding: 8px 18px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.cancel-btn {
+  background: #f0f0f0;
+  border: none;
+  padding: 8px 18px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+/* Animation */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.delete-modal {
+  width: 400px;
+}
+
+.delete-confirm-btn {
+  background: #c62828;
+  color: white;
+  border: none;
+  padding: 8px 18px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.delete-confirm-btn:hover {
+  background: #b71c1c;
+}
+
+.form-group.image-upload {
+  grid-column: span 2;
+}
+
+.cars-table th:first-child,
+.cars-table td:first-child {
+  width: 80px;
+}
+
+.cars-table img,
+.car-thumb {
+  width: 60px;
+  height: 40px;
+  object-fit: cover;
+  border-radius: 6px;
+  display: block; /* remove inline-block baseline spacing issues */
+}
+
+.cars-table td {
+  vertical-align: middle;
+}
+
+.cars-table td.actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}

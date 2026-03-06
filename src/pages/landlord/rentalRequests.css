@@ -1,0 +1,59 @@
+.requests-header {
+  margin-bottom: 20px;
+}
+
+.requests-table-wrapper {
+  background: white;
+  padding: 20px;
+  border-radius: 12px;
+}
+
+.requests-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.requests-table th,
+.requests-table td {
+  padding: 14px;
+  text-align: left;
+}
+
+.requests-table thead {
+  background: #f3f3f3;
+}
+
+.status {
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.status.pending {
+  background: #fff3cd;
+  color: #856404;
+}
+
+.status.approved {
+  background: #d4edda;
+  color: #155724;
+}
+
+.status.rejected {
+  background: #f8d7da;
+  color: #721c24;
+}
+
+.actions svg {
+  cursor: pointer;
+  margin-right: 10px;
+}
+
+.approve-icon {
+  color: green;
+}
+
+.reject-icon {
+  color: red;
+}
