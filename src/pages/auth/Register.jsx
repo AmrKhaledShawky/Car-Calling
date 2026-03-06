@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Mail, Lock, User, Phone, Globe, MapPin } from "lucide-react";
 import carImage from "../../assets/RegCar.png";
-import "../../Structure.css";
+import "./Register.css";
 
 export default function Registration() {
   const [formData, setFormData] = useState({

@@ -1,7 +1,7 @@
 import { Mail, Lock } from "lucide-react";
 import { useState } from "react";
 import carImage from "../../assets/car.png";
-import "../../index.css";
+import "./Login.css";
 import { Link } from "react-router-dom";
 
 export default function Login() {

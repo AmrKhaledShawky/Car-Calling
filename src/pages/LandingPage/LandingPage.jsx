@@ -74,7 +74,7 @@ const LandingPage = () => {
                     <div>
                         <h2><span>Top picks from our luxury collection</span>Featured Cars</h2>
                     </div>
-                    <Link to="/login" className="view-all">
+                    <Link to="/browse-cars" className="view-all">
                         View All +
                     </Link>
                 </div>
