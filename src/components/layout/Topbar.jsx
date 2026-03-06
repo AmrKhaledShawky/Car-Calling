@@ -1,6 +1,6 @@
 import { Bell, User } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import "./topbar.css";
+import "./Topbar.css";
 
 export default function Topbar() {
   const navigate = useNavigate();
