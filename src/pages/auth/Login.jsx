@@ -1,116 +1,101 @@
-import { Mail, Lock } from "lucide-react";
-import { useState } from "react";
-import carImage from "../../assets/car.png";
-import "./Login.css";
+import React, { useState } from "react";
+import "./login.css";
+import car from "../../assets/login.png";
+import { Eye, EyeOff } from "lucide-react";
 import { Link } from "react-router-dom";
 
 export default function Login() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [loading, setLoading] = useState(false);
 
-  const handleLogin = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-
-    try {
-      const response = await fetch("http://localhost:5000/api/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({ email, password })
-      });
-
-      const data = await response.json();
-
-      console.log("Server Response:", data);
-
-      // ⚠️ Do NOT navigate yet
-      // Navigation should happen only after backend validates user
-
-    } catch (error) {
-      console.error("Login Error:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const [showPassword, setShowPassword] = useState(false);
 
   return (
-    <div className="login-container">
-      <div className="bottom-circle"></div>
-      <div className="dot dot1"></div>
-      <div className="dot dot2"></div>
+    <div className="login-page">
 
-      {/* Top Nav */}
-      <div className="login-top-nav">
-        <div className="logo">
-          C<span>a</span>r C<span>a</span>lling...
-        </div>
-      </div>
-
-      {/* Left Side */}
+      {/* LEFT HERO */}
       <div className="login-left">
-        <h2>Welcome To</h2>
-        <h1 className="brand">Car Calling</h1>
 
-        <form onSubmit={handleLogin}>
-          <div className="input-group">
-            <label>Email</label>
-            <div className="input-wrapper">
-              <Mail className="input-icon" size={18} />
-              <input
-                type="email"
-                placeholder="Enter your email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-              />
-            </div>
-          </div>
-
-          <div className="input-group">
-            <label>Password</label>
-            <div className="input-wrapper">
-              <Lock className="input-icon" size={18} />
-              <input
-                type="password"
-                placeholder="Enter your password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-              />
-            </div>
-          </div>
-
-          <button type="submit" className="login-btn" disabled={loading}>
-            {loading ? "Starting..." : "Start Engine"}
-          </button>
-        </form>
-
-        <p className="signup-text">
-          Don’t Have An Account?{" "}
-          <Link to="/auth/register" className="signup-link">
-            SIGN UP
-          </Link>
-        </p>
-
-        <div className="footer">
-          <span>© Car Calling 2026</span>
-          <Link to="/privacy" className="privacy">
-            Privacy Policy
-          </Link>
+        <div className="login-brand">
+          🚗 Car Calling...
         </div>
+
+        <div className="login-left-content">
+
+          <img src={car} alt="car" className="login-car-image" />
+
+          <h2>Experience the Redline.</h2>
+
+          <p>
+            Premium rentals for those who demand excellence on every mile.
+          </p>
+
+        </div>
+
       </div>
 
-      {/* Right Side */}
+
+      {/* RIGHT LOGIN FORM */}
       <div className="login-right">
-        <div className="circle"></div>
-        <img src={carImage} alt="Car" />
-        <div className="slogan">
-          Power in Your <span>Hands.</span>
+
+        <div className="login-box">
+
+          <h1>Welcome Back</h1>
+
+          <p className="login-subtitle">
+            Please enter your details to access your account.
+          </p>
+
+          {/* EMAIL */}
+          <label>Email Address</label>
+          <input
+            type="email"
+            placeholder="name@company.com"
+          />
+
+          {/* PASSWORD */}
+          <div className="password-header">
+            <label>Password</label>
+
+            <span className="login-forgot">
+              Forgot Password?
+            </span>
+          </div>
+
+          <div className="login-password-input">
+
+            <input
+              type={showPassword ? "text" : "password"}
+              placeholder="••••••••"
+            />
+
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+            >
+              {showPassword ? <EyeOff size={18}/> : <Eye size={18}/>}
+            </button>
+
+          </div>
+
+          {/* LOGIN BUTTON */}
+          <button className="login-btn">
+            ⚡ Start Engine
+          </button>
+
+          {/* SIGNUP */}
+          <p className="login-signup">
+
+            Don't have an account?
+
+            <Link to="/auth/register">
+              Sign Up
+            </Link>
+
+          </p>
+
         </div>
+
       </div>
+
     </div>
   );
 }
