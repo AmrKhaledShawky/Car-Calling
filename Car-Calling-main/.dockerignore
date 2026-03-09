@@ -1,0 +1,11 @@
+node_modules
+dist
+.git
+.env
+.eslintcache
+.vscode
+build.log
+build2.log
+build_error.log
+docker_logs.txt
+*.log

@@ -1,0 +1,171 @@
+/* RESET ONLY FOR LOGIN PAGE */
+.login-page *{
+  box-sizing:border-box;
+  margin:0;
+  padding:0;
+}
+
+.login-page{
+  display:flex;
+  height:100vh;
+  font-family:Inter, sans-serif;
+  background:#f7f7f7;
+}
+
+/* LEFT SIDE */
+
+.login-left{
+  flex:1;
+  background:linear-gradient(
+    180deg,
+    #922323 0%,
+    #747373 100%
+  );
+  color:white;
+  padding:40px;
+  display:flex;
+  flex-direction:column;
+  justify-content:space-between;
+  border-radius:0 80px 80px 0;
+  position:relative;
+}
+
+.login-page .login-brand{
+  font-size:20px;
+  font-weight:600;
+}
+
+.login-left-content{
+  max-width:1000px;
+  position:relative;
+  z-index:2;
+}
+
+.login-car-image{
+  position:absolute;
+  bottom:5px;
+  left:45%;
+  transform:translateX(-50%);
+  width:120%;
+  height:auto;
+}
+
+.login-left-content h2{
+  font-size:36px;
+  margin-bottom:12px;
+  font-style:italic;
+}
+
+.login-left-content p{
+  color:#ddd;
+  font-size:14px;
+  line-height:1.5;
+}
+
+/* RIGHT SIDE */
+
+.login-right{
+  flex:1;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+}
+
+.login-box{
+  width:380px;
+}
+
+.login-box h1{
+  font-size:28px;
+  margin-bottom:6px;
+}
+
+.login-subtitle{
+  color:#777;
+  margin-bottom:30px;
+}
+
+/* FORM */
+
+.login-page label{
+  font-size:14px;
+  font-weight:500;
+}
+
+.login-page input{
+  width:100%;
+  padding:12px;
+  border-radius:12px;
+  border:1px solid #ddd;
+  margin-top:6px;
+  margin-bottom:18px;
+  font-size:14px;
+}
+
+/* PASSWORD */
+
+.login-password-header{
+  display:flex;
+  justify-content:space-between;
+  font-size:14px;
+}
+
+.login-forgot{
+  font-size:12px;
+  color:#8b0000;
+  cursor:pointer;
+}
+
+.login-password-input{
+  position:relative;
+}
+
+.login-password-input button{
+  position:absolute;
+  right:10px;
+  top:10px;
+  border:none;
+  background:none;
+  cursor:pointer;
+}
+
+/* LOGIN BUTTON */
+
+.login-btn{
+  width:100%;
+  padding:14px;
+  border:none;
+  border-radius:30px;
+  background:#8b0000;
+  color:white;
+  font-weight:600;
+  cursor:pointer;
+  margin-top:10px;
+  margin-bottom:20px;
+  box-shadow:0 8px 18px rgba(0,0,0,0.25);
+  transition:all .25s ease;
+}
+
+.login-btn:hover{
+  background:#a30000;
+  transform:translateY(-2px);
+}
+
+/* SIGNUP */
+
+.login-signup{
+  font-size:13px;
+  text-align:center;
+  color:#666;
+}
+
+.login-signup a{
+  color:#8b0000;
+  font-weight:600;
+  margin-left:5px;
+  text-decoration:none;
+}
+
+.login-signup a:hover{
+  text-decoration:underline;
+}
