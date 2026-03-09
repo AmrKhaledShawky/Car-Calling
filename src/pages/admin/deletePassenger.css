@@ -1,0 +1,59 @@
+.delete-passenger-container {
+  max-width: 500px;
+  margin: 50px auto; /* يجعلها في منتصف الصفحة */
+  padding: 30px;
+  background-color: #f9f9f9;
+  border-radius: 10px;
+  font-family: Arial, sans-serif;
+}
+
+/*the container of the header and the table */
+.delete-passenger-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.delete-passenger-form p {
+  font-size: 16px;
+  color: #000;
+  margin-top: 15px;
+}
+
+.delete-form-actions {
+  display: flex;
+  justify-content: space-between;
+  gap: 30px;
+  margin: 20px 0;
+  cursor: pointer;
+}
+
+
+.confirm-btn {
+  flex: 1;
+  padding: 10px;
+  background-color: #6B0202; /* أحمر */
+  color: white;
+  border: none;
+  border-radius: 5px;
+  font-weight: bold;
+}
+
+.confirm-btn:hover {
+  background-color: #c0392b;
+}
+
+/* زر الإلغاء */
+.cancel-btn {
+  flex: 1;
+  padding: 10px;
+  background-color:#6B0202 ; 
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-weight: bold;
+}
+
+.cancel-btn:hover {
+  background-color: #c0392b;
+}

@@ -1,0 +1,163 @@
+
+.userprofile-page {
+  min-height: 100vh;
+  background-color:rgb(204, 204, 204) ; /* خلفية بيضاء */
+  display: flex;
+  justify-content: center;
+  align-items: start;
+  padding: 24px;
+}
+
+
+.userprofile-container { /*the page that overlaps the background*/
+  background-color: white; /* خلفية بيضاء */
+  width: 100%;
+  max-width: 900px;
+  padding: 24px;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+
+.userprofile-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.userprofile-username {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #000; /* أسود */
+}
+
+.userprofile-save-btn {
+  display: flex;
+  align-items: center;
+  background-color: #6B0202; /* أحمر */
+  color: white; /* الكلمة أبيض */
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+.userprofile-save-btn:hover {
+  background-color: #ef4444; 
+  transform: translateY(-10px) scale(1.02)/* أحمر فاتح عند التمرير */
+}
+
+.userprofile-save-icon {
+  width: 18px;
+  height: 18px;
+  margin-right: 8px;
+}
+
+/* Profile Section */
+.userprofile-profile {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+@media(min-width: 768px) {
+  .userprofile-profile {
+    flex-direction: row;
+    align-items: start;
+  }
+}
+
+.userprofile-avatar {
+  flex-shrink: 0;
+  width: 96px;
+  height: 96px;
+  border-radius: 50%;
+  background-color: #6B0202; /* رمادي فاتح */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.userprofile-avatar-icon {
+  width: 48px;
+  height: 48px;
+  color: white; /* رمادي متوسط */
+}
+
+.userprofile-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.userprofile-name {
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #000; /* أسود */
+}
+
+.userprofile-email {
+  color: #000; /* أسود */
+  text-decoration: none;
+  font-weight: bold;
+}
+
+/* Form Section */
+.userprofile-form-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.userprofile-form-title {
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #000; /* أسود */
+}
+
+.userprofile-divider {
+  border: none;
+  border-top: 1px solid #d1d5db;
+}
+
+/* Form Layout */
+.userprofile-form {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+
+@media(min-width: 768px) {
+  .userprofile-form {
+    grid-template-columns: 150px 1fr;
+    align-items: center;
+    gap: 16px;
+  }
+}
+
+.userprofile-form label {
+  font-weight: bold;
+  color: #000; /* أسود */
+}
+
+.userprofile-form input,
+.userprofile-form select {
+  padding: 8px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  outline: none;
+  font-weight: bold;
+  color: #000; 
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.userprofile-form input:focus,
+.userprofile-form select:focus {
+  border-color: #ef4444; /* أحمر عند التركيز */
+  box-shadow: 0 0 0 2px rgba(239,68,68,0.2);
+}

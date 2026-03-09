@@ -1,0 +1,45 @@
+.admin-topbar {
+  position: fixed;
+  top: 0;
+  left: 250px;              /* يبدأ بعد السايد بار */
+  width: calc(100% - 250px); /* ياخد باقي الصفحة */
+
+  height: 70px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  padding: 0 20px;
+
+  background-color: rgb(204, 204, 204);
+  border-bottom: 1px solid #ddd;
+
+  box-sizing: border-box;
+  margin: 0;
+
+  z-index: 1000;
+}
+
+.admin-title {
+  font-size: 1.7rem;
+  font-weight: bold;
+  color: #000;
+  margin: 0;
+  line-height: 1;
+}
+
+.admin-icon {
+  font-size: 2rem;
+  cursor: pointer;
+  color: #000;
+  transition: color 0.2s ease;
+}
+
+.admin-icon:hover {
+  color: #6B0202;
+}
+
+.admin-container {
+  padding-top: 80px;
+}

@@ -1,0 +1,89 @@
+.passenger-page {
+  display: flex;
+  min-height: 100vh;
+  background: #f5f5f5;
+}
+
+
+.passenger-page > .sidebar {
+  width: 250px; /* عرض ثابت للـ Sidebar */
+  height: 100vh;
+  position: fixed; /* يبقى ثابت على الشمال */
+  top: 0;
+  left: 0;
+  background-color: #1f1f1f; /* غامق شوية */
+  color: white;
+}
+
+
+.passenger-content {
+  margin-left: 0px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+}
+
+/* Topbar */
+.passenger-content > .topbar {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: white;
+  padding: 10px 20px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+/* Header فوق الجدول */
+.passenger-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.add-btn {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  background-color: #6B0202;
+  color: white;
+  padding: 8px 12px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+/* جدول الركاب */
+.passenger-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.passenger-table th, .passenger-table td {
+  padding: 12px 15px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+}
+
+.profile-pic {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.action-icon {
+  cursor: pointer;
+  margin-right: 10px;
+}
+
+.action-icon.edit {
+  color: #2196f3;
+}
+
+.action-icon.delete {
+  color: #f44336;
+}
