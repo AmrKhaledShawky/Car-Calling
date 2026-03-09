@@ -9,7 +9,7 @@ import Register from "../pages/auth/Register";
 import Privacy from "../pages/privacy";
 import LandingPage from "../pages/LandingPage/LandingPage";
 import BrowseCars from "../pages/LandingPage/BrowseCars";
-import CarOwner from "../pages/admin/carowner";
+import CarOwner from "../pages/admin/Carowner";
 import AddCar from "../pages/admin/addcar";
 import DeleteCar from "../pages/admin/deletecar";
 import EditCar from "../pages/admin/editcar";
