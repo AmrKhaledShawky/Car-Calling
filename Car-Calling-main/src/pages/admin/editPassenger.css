@@ -1,0 +1,68 @@
+.edit-passenger-container {
+  max-width: 500px;
+  margin: 50px auto;
+  padding: 30px;
+  background-color: rgb(204, 204, 204);
+  border-radius: 15px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+  font-family: 'Arial', sans-serif;
+}
+
+/* Title */
+.edit-passenger-container h2 {
+  text-align: center;
+  margin-bottom: 25px;
+  color: #333;
+}
+
+/* Form */
+.edit-passenger-form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+/* Input wrapper for icon */
+.input-wrapper {
+  position: relative;
+}
+
+.edit-passenger-form input {
+  width: 100%;
+  padding: 12px 15px 12px 40px;
+  border: 1px solid white;
+  background-color: white;
+  border-radius: 10px;
+  font-size: 14px;
+  transition: 0.3s;
+}
+
+/* Icons */
+.input-wrapper i {
+  position: absolute;
+  top: 50%;
+  left: 12px;
+  transform: translateY(-50%);
+  color: #888;
+}
+
+/* Button */
+.form-actions {
+  text-align: center;
+  margin-top: 15px;
+}
+
+.form-actions button {
+  background-color: #6B0202;
+  color: white;
+  padding: 12px 25px;
+  font-size: 16px;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.form-actions button:hover {
+  background-color: #e74c3c;
+}

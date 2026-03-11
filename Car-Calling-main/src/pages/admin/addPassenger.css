@@ -1,0 +1,55 @@
+.add-passenger-container {
+  padding: 20px;
+  max-width: 600px;
+  margin: 0 auto;
+  background: rgb(204, 204, 204);
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.add-passenger-container h2 {
+  color: black;
+  margin-bottom: 20px;
+}
+
+.add-passenger-form { /* form making them and the labels in a row */
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.add-passenger-form label {
+  color: black;
+  width: 120px;
+  font-weight: 500;
+}
+
+.add-passenger-form input {
+  flex: 1;
+  padding: 8px 12px;
+  border: 1px solid white;
+  border-radius: 6px;
+  color: black;
+  font-size: 14px;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 20px;
+}
+
+.form-actions button {
+  background-color: #6B0202; 
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  margin-top: 10px;
+}
+
+.form-actions button:hover {
+  background-color: #e74c3c;
+}
