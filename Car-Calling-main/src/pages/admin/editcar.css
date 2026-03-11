@@ -1,0 +1,78 @@
+.edit-car-container {
+  max-width: 600px;
+  margin: 40px auto;
+  padding: 30px;
+  background-color: #fff;
+  border-radius: 12px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+  font-family: 'Arial', sans-serif;
+}
+
+.edit-car-container h2 {
+  text-align: center;
+  margin-bottom: 25px;
+  color: #000;
+}
+
+.edit-car-form .input-wrapper {
+  position: relative;
+  margin-bottom: 20px;
+}
+
+.edit-car-form .input-wrapper i {
+  position: absolute;
+  top: 50%;
+  left: 12px;
+  transform: translateY(-50%);
+  color: #888;
+  font-size: 18px;
+}
+
+.edit-car-form input,
+.edit-car-form textarea {
+  width: 100%;
+  padding: 12px 12px 12px 40px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 14px;
+  transition: all 0.2s ease;
+}
+
+.edit-car-form input:focus,
+.edit-car-form textarea:focus {
+  border-color: #6B0202;
+  outline: none;
+}
+
+.edit-car-form textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+.edit-car-form .form-actions {
+  text-align: center;
+  margin-top: 25px;
+}
+
+.edit-car-form button {
+  background-color: #6B0202;
+  color: #fff;
+  padding: 12px 35px;
+  font-size: 16px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.edit-car-form button:hover {
+  background-color: #e74c3c;
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+  .edit-car-container {
+    margin: 20px;
+    padding: 20px;
+  }
+}

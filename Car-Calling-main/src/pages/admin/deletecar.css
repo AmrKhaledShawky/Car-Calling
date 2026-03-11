@@ -1,0 +1,64 @@
+.delete-car-container {
+  max-width: 500px;
+  margin: 60px auto;
+  padding: 30px;
+  background-color: #fff;
+  border-radius: 12px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+  font-family: 'Arial', sans-serif;
+  text-align: center;
+}
+
+.delete-car-container h2 {
+  margin-bottom: 20px;
+  color: #000;
+}
+
+.delete-car-form p {
+  font-size: 16px;
+  color: #000;
+  margin-bottom: 30px;
+}
+
+.delete-form-actions {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+}
+
+.delete-form-actions button {
+  padding: 12px 30px;
+  font-size: 15px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+/* Confirm Delete button */
+.confirm-btn {
+  background-color: #6B0202;
+  color: white;
+}
+
+.confirm-btn:hover {
+  background-color: #e74c3c;
+}
+
+/* Cancel button */
+.cancel-btn {
+  background-color: #6B0202;
+  color: white;
+}
+
+.cancel-btn:hover {
+  background-color: #e74c3c;
+}
+
+/* Responsive */
+@media (max-width: 500px) {
+  .delete-form-actions {
+    flex-direction: column;
+    gap: 15px;
+  }
+}
