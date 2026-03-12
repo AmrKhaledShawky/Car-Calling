@@ -21,6 +21,9 @@ import DeletePassenger from "../pages/admin/deletePassenger";
 import AdminProfile from "../pages/admin/adminprofile";
 import AdminDashboard from "../pages/admin/AdminDashboard";
 import Transactions from "../pages/admin/transaction";
+import CarIssues from "../pages/admin/carIssues";
+import Review from "../pages/admin/review";
+import Report from "../pages/admin/report";
 function Router() {
   return (
     <BrowserRouter>
@@ -47,6 +50,9 @@ function Router() {
         <Route path="/admin/profile" element={<AdminProfile />} />
         <Route path="/admin/dashboard" element={<AdminDashboard />} />
         <Route path="/admin/transaction" element={<Transactions />} />
+        <Route path="/admin/carissues" element={<CarIssues />} />
+        <Route path="/admin/review" element={<Review />} />
+        <Route path="/admin/report" element={<Report />} />
       </Routes>
     </BrowserRouter>
   );

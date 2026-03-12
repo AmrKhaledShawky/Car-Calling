@@ -1,0 +1,160 @@
+.car-issues-container{
+padding:20px;
+}
+
+
+.issues-table{
+width:100%;
+border-collapse:collapse;
+background:white;
+}
+
+.issues-table th,
+.issues-table td{
+padding:12px;
+border-bottom:1px solid #000;
+text-align:center;
+}
+
+.issues-table th{
+background:white;
+font-weight:600;
+}
+
+.view-btn{
+border:none;
+background:#6B0202;
+color:white;
+padding:8px 10px;
+border-radius:6px;
+cursor:pointer;
+font-size:14px;
+}
+
+.view-btn:hover{
+background:green;
+}
+
+.modal-overlay{
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+background:rgba(0,0,0,0.4);
+display:flex;
+justify-content:center;
+align-items:center;
+}
+
+.modal{
+background:white;
+padding:25px;
+width:600px;
+border-radius:10px;
+}
+
+.owner-info{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:10px;
+margin-bottom:20px;
+}
+
+.issues-details{
+width:100%;
+border-collapse:collapse;
+}
+
+.issues-details th,
+.issues-details td{
+padding:10px;
+border-bottom:1px solid #000;
+text-align:center;
+}
+
+.status.Open{
+color:red;
+font-weight:600;
+background-color: rgb(204, 204, 204)
+}
+
+.status.Resolved{
+color:green;
+font-weight:600;
+background-color: rgb(204, 204, 204);
+}
+
+.close-btn{
+margin-top:15px;
+padding:8px 16px;
+border:none;
+background:#6B0202;
+color:white;
+border-radius:6px;
+cursor:pointer;
+}
+.add-btn{
+border:none;
+background:#6B0202;
+color:white;
+padding:8px 10px;
+border-radius:6px;
+cursor:pointer;
+font-size:14px;
+margin-right:5px;
+}
+.add-btn:hover{
+background:green;
+}
+.edit-btn{
+border:none;
+background:#FFA500;
+color:white;
+padding:6px 8px;
+border-radius:5px;
+cursor:pointer;
+margin-right:5px;
+}
+
+.assign-btn{
+border:none;
+background:#1E90FF;
+color:white;
+padding:6px 8px;
+border-radius:5px;
+cursor:pointer;
+}
+
+.save-btn{
+margin-top:10px;
+padding:8px 16px;
+border:none;
+background:#027B02;
+color:white;
+border-radius:6px;
+cursor:pointer;
+margin-right:10px;
+}
+
+.modal-action-buttons button{
+margin-right:5px;
+}
+.notification {
+  position: fixed;
+  top: 80px;
+  right: 30px;
+  background: #6B0202;
+  color: white;
+  padding: 12px 20px;
+  border-radius: 6px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+  z-index: 9999;
+  font-weight: 500;
+}
+.action-buttons {
+  display: flex;
+  flex-direction: column; 
+  gap: 5px;              
+  align-items: center;     
+}
