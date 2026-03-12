@@ -1,0 +1,81 @@
+.reviews-container {
+  padding: 20px;
+}
+
+.reviews-table, .reviews-details {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.reviews-table th, .reviews-table td,
+.reviews-details th, .reviews-details td {
+  padding: 12px;
+  border-bottom: 1px solid #000;
+  text-align: center;
+}
+
+.view-btn, .react-btn {
+  border: none;
+  background: #6B0202;
+  color: white;
+  padding: 8px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.react-btn {
+  background: #027B02;
+}
+
+.view-btn:hover, .react-btn:hover {
+  opacity: 0.8;
+}
+
+/* modal */
+.modal-overlay{
+  position: fixed;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  background: rgba(0,0,0,0.4);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+}
+
+.modal{
+  background: white;
+  padding: 25px;
+  width: 600px;
+  border-radius: 10px;
+}
+
+.close-btn{
+  margin-top: 15px;
+  padding: 8px 16px;
+  border: none;
+  background: #6B0202;
+  color: white;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.notification {
+  position: fixed;
+  top: 80px;
+  right: 30px;
+  background: #4caf50;
+  color: white;
+  padding: 12px 20px;
+  border-radius: 6px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+  z-index: 9999;
+  font-weight: 500;
+}
+
+.reviews-details svg {
+  margin: 0 2px;
+}

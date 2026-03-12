@@ -11,7 +11,7 @@ const AdminSidebar = ({ collapsed, setCollapsed }) => {
     { name: "Passengers", icon: <FaUserFriends />, path: "/admin/passengers" },
     { name: "Car Owners", icon: <FaCar />, path: "/admin/carowner" },
     { name: "Rental Transactions", icon: <FaExchangeAlt />, path: "/admin/transaction" },
-    { name: "Car Issues", icon: <FaExclamationTriangle />, path: "/admin/car-issues" },
+    { name: "Car Issues", icon: <FaExclamationTriangle />, path: "/admin/carissues" },
     { name: "Review", icon: <FaStar />, path: "/admin/review" },
     { name: "Report", icon: <FaFileAlt />, path: "/admin/report" },
   ];
