@@ -224,7 +224,6 @@ const bookingSchema = new mongoose.Schema({
   // Metadata
   bookingReference: {
     type: String,
-    unique: true,
     required: true
   },
   source: {
@@ -239,12 +238,12 @@ const bookingSchema = new mongoose.Schema({
 });
 
 // Indexes for better performance
+bookingSchema.index({ bookingReference: 1 }, { unique: true });
 bookingSchema.index({ customer: 1, status: 1 });
 bookingSchema.index({ owner: 1, status: 1 });
 bookingSchema.index({ car: 1 });
 bookingSchema.index({ startDate: 1, endDate: 1 });
 bookingSchema.index({ status: 1, createdAt: -1 });
-bookingSchema.index({ bookingReference: 1 });
 
 // Virtual for booking period
 bookingSchema.virtual('bookingPeriod').get(function() {

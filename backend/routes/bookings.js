@@ -45,19 +45,19 @@ const bookingIdValidation = [
 // All routes require authentication
 router.use(protect);
 
-// User routes
+// Shared/General booking routes (Controller handles fine-grained authorization)
 router.get('/my-bookings', getMyBookings);
 router.post('/', bookingValidation, createBooking);
+router.get('/:id', bookingIdValidation, getBooking);
+router.put('/:id', bookingIdValidation, updateBooking);
+router.put('/:id/cancel', bookingIdValidation, cancelBooking);
 
-// Owner routes
+// Owner routes (for landlords)
 router.get('/owner-bookings', authorize('landlord'), getOwnerBookings);
-router.put('/:id/confirm', authorize('landlord'), bookingIdValidation, ownerOrAdmin, confirmBooking);
-router.put('/:id/complete', authorize('landlord'), bookingIdValidation, ownerOrAdmin, completeBooking);
+router.put('/:id/confirm', authorize('landlord'), bookingIdValidation, confirmBooking);
+router.put('/:id/complete', authorize('landlord'), bookingIdValidation, completeBooking);
 
 // Admin routes
 router.get('/', authorize('admin'), getBookings);
-router.get('/:id', authorize('admin'), bookingIdValidation, getBooking);
-router.put('/:id', authorize('admin'), bookingIdValidation, updateBooking);
-router.put('/:id/cancel', authorize('admin'), bookingIdValidation, cancelBooking);
 
 export default router;
