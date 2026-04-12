@@ -77,9 +77,9 @@ export const register = async (req, res) => {
     await sendTokenResponse(user, 201, res);
   } catch (error) {
     console.error('Register error:', error);
-    res.status(500).json({
+    res.status(error.name === 'ValidationError' ? 400 : 500).json({
       success: false,
-      message: 'Server error during registration'
+      message: error.name === 'ValidationError' ? error.message : 'Server error during registration'
     });
   }
 };

@@ -79,7 +79,24 @@ app.get('/api/health', (req, res) => {
 });
 
 // API routes
-app.use('/api', authRoutes);
+app.use('/api/auth', authRoutes);
+app.use('/api', (req, res, next) => {
+  const legacyAuthPaths = new Set([
+    '/login',
+    '/register',
+    '/logout',
+    '/me',
+    '/refresh-token',
+    '/forgot-password',
+    '/reset-password'
+  ]);
+
+  if (legacyAuthPaths.has(req.path) || req.path.startsWith('/verify-email/')) {
+    return authRoutes(req, res, next);
+  }
+
+  next();
+});
 app.use('/api/cars', carRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/bookings', bookingRoutes);
