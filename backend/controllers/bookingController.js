@@ -2,13 +2,108 @@ import { validationResult } from 'express-validator';
 import Booking from '../models/Booking.js';
 import Car from '../models/Car.js';
 
+const ADDITIONAL_SERVICE_PRICING = {
+  child_seat: 15,
+  gps: 10,
+  additional_driver: 25,
+  doorstep_delivery: 40
+};
+
+const roundCurrency = (value) => Math.round(value * 100) / 100;
+
+const buildUserSummary = (user) => {
+  if (!user) {
+    return null;
+  }
+
+  return {
+    id: user._id,
+    name: user.name,
+    email: user.email,
+    phone: user.phone || ''
+  };
+};
+
+const buildCarSummary = (car) => {
+  if (!car) {
+    return null;
+  }
+
+  return {
+    id: car._id,
+    make: car.make,
+    model: car.model,
+    year: car.year,
+    dailyRate: car.dailyRate,
+    fuelType: car.fuelType,
+    transmission: car.transmission,
+    seats: car.seats,
+    primaryImage: car.primaryImage?.url || car.images?.[0]?.url || ''
+  };
+};
+
+const buildBookingResponse = (booking) => {
+  const bookingObject = booking.toObject ? booking.toObject({ virtuals: true }) : booking;
+
+  return {
+    ...bookingObject,
+    carSummary: buildCarSummary(bookingObject.car),
+    customerSummary: buildUserSummary(bookingObject.customer),
+    ownerSummary: buildUserSummary(bookingObject.owner),
+    pricing: {
+      duration: bookingObject.duration,
+      dailyRate: bookingObject.dailyRate,
+      subtotal: bookingObject.subtotal,
+      serviceFee: bookingObject.serviceFee,
+      insuranceFee: bookingObject.insuranceFee,
+      tax: bookingObject.tax,
+      totalAmount: bookingObject.totalAmount
+    }
+  };
+};
+
+const normalizeAdditionalServices = (services = []) => {
+  if (!Array.isArray(services)) {
+    return { error: 'Additional services must be an array' };
+  }
+
+  const normalizedServices = [];
+  let additionalServicesTotal = 0;
+
+  for (const service of services) {
+    const serviceName = typeof service?.name === 'string' ? service.name.trim().toLowerCase() : '';
+    const quantity = Number(service?.quantity || 1);
+
+    if (!serviceName || !ADDITIONAL_SERVICE_PRICING[serviceName]) {
+      return { error: `Unsupported additional service: ${service?.name || 'unknown'}` };
+    }
+
+    if (!Number.isInteger(quantity) || quantity < 1) {
+      return { error: `Invalid quantity for additional service: ${serviceName}` };
+    }
+
+    const price = ADDITIONAL_SERVICE_PRICING[serviceName];
+    additionalServicesTotal += price * quantity;
+    normalizedServices.push({
+      name: serviceName,
+      price,
+      quantity
+    });
+  }
+
+  return {
+    normalizedServices,
+    additionalServicesTotal: roundCurrency(additionalServicesTotal)
+  };
+};
+
 // Get all bookings (Admin only)
 export const getBookings = async (req, res) => {
   try {
     const bookings = await Booking.find()
       .populate('car', 'make model year images')
-      .populate('customer', 'firstName lastName email')
-      .populate('owner', 'firstName lastName email')
+      .populate('customer', 'name email phone')
+      .populate('owner', 'name email phone')
       .sort({ createdAt: -1 });
 
     res.status(200).json({
@@ -30,8 +125,8 @@ export const getBooking = async (req, res) => {
   try {
     const booking = await Booking.findById(req.params.id)
       .populate('car')
-      .populate('customer', 'firstName lastName email phoneNumber')
-      .populate('owner', 'firstName lastName email phoneNumber');
+      .populate('customer', 'name email phone')
+      .populate('owner', 'name email phone');
 
     if (!booking) {
       return res.status(404).json({
@@ -54,7 +149,7 @@ export const getBooking = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      data: booking
+      data: buildBookingResponse(booking)
     });
   } catch (error) {
     res.status(500).json({
@@ -134,20 +229,30 @@ export const createBooking = async (req, res) => {
       });
     }
 
+    const { normalizedServices, additionalServicesTotal, error: servicesError } = normalizeAdditionalServices(additionalServices);
+    if (servicesError) {
+      return res.status(400).json({
+        success: false,
+        message: servicesError
+      });
+    }
+
     // 4. Calculate Pricing
     // Duration in days
     const diffTime = Math.abs(end - start);
     const duration = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) || 1;
 
-    const dailyRate = selectedCar.dailyRate;
-    const subtotal = dailyRate * duration;
+    const dailyRate = roundCurrency(selectedCar.getDiscountedRate(duration));
+    const subtotal = roundCurrency(dailyRate * duration);
     
     // Fixed fees for demonstration (could be moved to a config/utility)
-    const serviceFee = Math.round(subtotal * 0.05 * 100) / 100; // 5% service fee
-    const insuranceFee = insuranceType === 'premium' ? (20 * duration) : (insuranceType === 'basic' ? (10 * duration) : 0);
-    const tax = Math.round((subtotal + serviceFee + insuranceFee) * 0.10 * 100) / 100; // 10% tax
+    const serviceFee = roundCurrency(subtotal * 0.05); // 5% service fee
+    const insuranceFee = roundCurrency(
+      insuranceType === 'premium' ? (20 * duration) : (insuranceType === 'basic' ? (10 * duration) : 0)
+    );
+    const tax = roundCurrency((subtotal + serviceFee + insuranceFee + additionalServicesTotal) * 0.10); // 10% tax
     
-    const totalAmount = subtotal + serviceFee + insuranceFee + tax;
+    const totalAmount = roundCurrency(subtotal + serviceFee + insuranceFee + additionalServicesTotal + tax);
 
     // 5. Setup Locations (default to car's location if not provided)
     const finalPickup = {
@@ -184,7 +289,7 @@ export const createBooking = async (req, res) => {
       pickupLocation: finalPickup,
       returnLocation: finalReturn,
       specialRequests,
-      additionalServices: additionalServices || [],
+      additionalServices: normalizedServices,
       status: 'pending',
       paymentStatus: 'pending',
       source: 'website'
@@ -195,13 +300,13 @@ export const createBooking = async (req, res) => {
     // 7. Return Populated Response
     const responseBooking = await Booking.findById(booking._id)
       .populate('car', 'make model year images dailyRate fuelType transmission seats')
-      .populate('customer', 'firstName lastName email phoneNumber')
-      .populate('owner', 'firstName lastName email phoneNumber');
+      .populate('customer', 'name email phone')
+      .populate('owner', 'name email phone');
 
     res.status(201).json({
       success: true,
       message: 'Booking created successfully',
-      data: responseBooking
+      data: buildBookingResponse(responseBooking)
     });
 
   } catch (error) {
@@ -309,7 +414,7 @@ export const getMyBookings = async (req, res) => {
   try {
     const bookings = await Booking.find({ customer: req.user.id })
       .populate('car', 'make model year images dailyRate')
-      .populate('owner', 'firstName lastName email')
+      .populate('owner', 'name email phone')
       .sort({ createdAt: -1 });
 
     res.status(200).json({
@@ -331,7 +436,7 @@ export const getOwnerBookings = async (req, res) => {
   try {
     const bookings = await Booking.find({ owner: req.user.id })
       .populate('car', 'make model year images dailyRate')
-      .populate('customer', 'firstName lastName email phoneNumber')
+      .populate('customer', 'name email phone')
       .sort({ createdAt: -1 });
 
     res.status(200).json({

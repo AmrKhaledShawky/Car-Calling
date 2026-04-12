@@ -1,5 +1,13 @@
 import mongoose from 'mongoose';
 
+const generateBookingReference = () => {
+  const date = new Date();
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const random = Math.floor(Math.random() * 1000).toString().padStart(3, '0');
+  return `BK${year}${month}${random}`;
+};
+
 const bookingSchema = new mongoose.Schema({
   // Booking parties
   customer: {
@@ -224,7 +232,8 @@ const bookingSchema = new mongoose.Schema({
   // Metadata
   bookingReference: {
     type: String,
-    required: true
+    required: true,
+    default: generateBookingReference
   },
   source: {
     type: String,
@@ -262,12 +271,7 @@ bookingSchema.virtual('totalPaid').get(function() {
 // Pre-save middleware to generate booking reference
 bookingSchema.pre('save', function(next) {
   if (this.isNew && !this.bookingReference) {
-    // Generate a unique booking reference like BK2024001
-    const date = new Date();
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const random = Math.floor(Math.random() * 1000).toString().padStart(3, '0');
-    this.bookingReference = `BK${year}${month}${random}`;
+    this.bookingReference = generateBookingReference();
   }
   next();
 });

@@ -27,13 +27,23 @@ const bookingValidation = [
     .isISO8601()
     .withMessage('Please provide a valid end date'),
   body('pickupLocation.address')
+    .optional()
     .trim()
     .notEmpty()
-    .withMessage('Pickup address is required'),
+    .withMessage('Pickup address cannot be empty'),
   body('returnLocation.address')
+    .optional()
     .trim()
     .notEmpty()
-    .withMessage('Return address is required')
+    .withMessage('Return address cannot be empty'),
+  body('insuranceType')
+    .optional()
+    .isIn(['basic', 'premium', 'none'])
+    .withMessage('Insurance type must be basic, premium, or none'),
+  body('additionalServices')
+    .optional()
+    .isArray()
+    .withMessage('Additional services must be an array')
 ];
 
 const bookingIdValidation = [
