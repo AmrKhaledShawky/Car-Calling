@@ -46,7 +46,7 @@ export const AuthProvider = ({ children }) => {
       if (token) {
         try {
           // Verify token with backend
-          const data = await apiCall('/me');
+          const data = await apiCall('/auth/me');
           if (data.success) {
             persistAuth(data.data.user, token, localStorage.getItem('refreshToken'));
           } else {
@@ -65,7 +65,7 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (email, password) => {
     try {
-      const data = await apiCall('/login', {
+      const data = await apiCall('/auth/login', {
         method: 'POST',
         body: JSON.stringify({ email, password }),
       });
@@ -92,7 +92,7 @@ export const AuthProvider = ({ children }) => {
 
   const register = async (name, email, password, role = 'user') => {
     try {
-      const data = await apiCall('/register', {
+      const data = await apiCall('/auth/register', {
         method: 'POST',
         body: JSON.stringify({ name, email, password, role }),
       });
@@ -119,7 +119,7 @@ export const AuthProvider = ({ children }) => {
 
   const logout = async () => {
     try {
-      await apiCall('/logout', {
+      await apiCall('/auth/logout', {
         method: 'POST',
       });
     } catch (error) {
@@ -130,11 +130,25 @@ export const AuthProvider = ({ children }) => {
     toast.success('Logged out successfully');
   };
 
+  const updateProfile = async (profileData) => {
+    const data = await apiCall('/auth/profile', {
+      method: 'PUT',
+      body: JSON.stringify(profileData),
+    });
+
+    if (data.success && data.data?.user) {
+      persistAuth(data.data.user, localStorage.getItem('token'), localStorage.getItem('refreshToken'));
+    }
+
+    return data;
+  };
+
   const value = {
     user,
     loading,
     login,
     register,
+    updateProfile,
     logout,
     isAuthenticated: !!user,
     getAuthorizedRoute,

@@ -11,6 +11,129 @@ const ADDITIONAL_SERVICE_PRICING = {
 
 const roundCurrency = (value) => Math.round(value * 100) / 100;
 
+const BOOKING_POPULATE = [
+  { path: 'car', select: 'make model year images dailyRate fuelType transmission seats owner status location' },
+  { path: 'customer', select: 'name email phone role' },
+  { path: 'owner', select: 'name email phone role' }
+];
+
+const parsePositiveInteger = (value, fallback, { max } = {}) => {
+  const parsedValue = Number.parseInt(value, 10);
+
+  if (!Number.isFinite(parsedValue) || parsedValue < 1) {
+    return fallback;
+  }
+
+  if (max) {
+    return Math.min(parsedValue, max);
+  }
+
+  return parsedValue;
+};
+
+const buildBookingFilters = (query = {}) => {
+  const filters = {};
+  const { status, date, startDate, endDate } = query;
+
+  if (status) {
+    filters.status = status;
+  }
+
+  if (date) {
+    const requestedDate = new Date(date);
+
+    if (Number.isNaN(requestedDate.getTime())) {
+      return { error: 'Invalid date filter' };
+    }
+
+    filters.startDate = { $lte: requestedDate };
+    filters.endDate = { $gte: requestedDate };
+  } else {
+    if (startDate) {
+      const requestedStartDate = new Date(startDate);
+
+      if (Number.isNaN(requestedStartDate.getTime())) {
+        return { error: 'Invalid startDate filter' };
+      }
+
+      filters.endDate = { ...(filters.endDate || {}), $gte: requestedStartDate };
+    }
+
+    if (endDate) {
+      const requestedEndDate = new Date(endDate);
+
+      if (Number.isNaN(requestedEndDate.getTime())) {
+        return { error: 'Invalid endDate filter' };
+      }
+
+      filters.startDate = { ...(filters.startDate || {}), $lte: requestedEndDate };
+    }
+  }
+
+  return { filters };
+};
+
+const buildPagination = (query = {}) => {
+  const page = parsePositiveInteger(query.page, 1);
+  const limit = parsePositiveInteger(query.limit, 10, { max: 100 });
+  const skip = (page - 1) * limit;
+
+  return {
+    page,
+    limit,
+    skip
+  };
+};
+
+const buildBookingPagination = (page, limit, total) => ({
+  currentPage: page,
+  totalPages: total === 0 ? 0 : Math.ceil(total / limit),
+  totalBookings: total,
+  hasNext: page * limit < total,
+  hasPrev: page > 1
+});
+
+const getScopedBookings = async ({ scope = {}, req }) => {
+  const { filters, error } = buildBookingFilters(req.query);
+
+  if (error) {
+    return { error };
+  }
+
+  const query = { ...scope, ...filters };
+  const { page, limit, skip } = buildPagination(req.query);
+
+  const [bookings, total] = await Promise.all([
+    Booking.find(query)
+      .populate(BOOKING_POPULATE)
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit),
+    Booking.countDocuments(query)
+  ]);
+
+  return {
+    bookings,
+    total,
+    page,
+    limit
+  };
+};
+
+const getRequestValidationError = (req) => {
+  const errors = validationResult(req);
+
+  if (errors.isEmpty()) {
+    return null;
+  }
+
+  return {
+    success: false,
+    message: 'Validation failed',
+    errors: errors.array()
+  };
+};
+
 const buildUserSummary = (user) => {
   if (!user) {
     return null;
@@ -62,6 +185,18 @@ const buildBookingResponse = (booking) => {
   };
 };
 
+const buildFallbackLocationAddress = (car) => {
+  const parts = [
+    car?.location?.address,
+    car?.location?.city,
+    car?.location?.state
+  ]
+    .map((value) => (typeof value === 'string' ? value.trim() : ''))
+    .filter(Boolean);
+
+  return parts.join(', ') || 'Owner location';
+};
+
 const normalizeAdditionalServices = (services = []) => {
   if (!Array.isArray(services)) {
     return { error: 'Additional services must be an array' };
@@ -100,16 +235,25 @@ const normalizeAdditionalServices = (services = []) => {
 // Get all bookings (Admin only)
 export const getBookings = async (req, res) => {
   try {
-    const bookings = await Booking.find()
-      .populate('car', 'make model year images')
-      .populate('customer', 'name email phone')
-      .populate('owner', 'name email phone')
-      .sort({ createdAt: -1 });
+    const validationError = getRequestValidationError(req);
+    if (validationError) {
+      return res.status(400).json(validationError);
+    }
+
+    const scopedResult = await getScopedBookings({ req });
+
+    if (scopedResult.error) {
+      return res.status(400).json({
+        success: false,
+        message: scopedResult.error
+      });
+    }
 
     res.status(200).json({
       success: true,
-      count: bookings.length,
-      data: bookings
+      count: scopedResult.bookings.length,
+      pagination: buildBookingPagination(scopedResult.page, scopedResult.limit, scopedResult.total),
+      data: scopedResult.bookings.map(buildBookingResponse)
     });
   } catch (error) {
     res.status(500).json({
@@ -123,10 +267,13 @@ export const getBookings = async (req, res) => {
 // Get single booking
 export const getBooking = async (req, res) => {
   try {
+    const validationError = getRequestValidationError(req);
+    if (validationError) {
+      return res.status(400).json(validationError);
+    }
+
     const booking = await Booking.findById(req.params.id)
-      .populate('car')
-      .populate('customer', 'name email phone')
-      .populate('owner', 'name email phone');
+      .populate(BOOKING_POPULATE);
 
     if (!booking) {
       return res.status(404).json({
@@ -141,7 +288,7 @@ export const getBooking = async (req, res) => {
     const isAdmin = req.user.role === 'admin';
 
     if (!isCustomer && !isOwner && !isAdmin) {
-      return res.status(401).json({
+      return res.status(403).json({
         success: false,
         message: 'Not authorized to access this booking'
       });
@@ -172,8 +319,11 @@ export const createBooking = async (req, res) => {
     if (!errors.isEmpty()) {
       return res.status(400).json({
         success: false,
-        message: 'Validation failed',
-        errors: errors.array()
+        message: 'Please check your booking details and try again.',
+        errors: errors.array().map((error) => ({
+          field: error.path,
+          message: error.msg
+        }))
       });
     }
 
@@ -256,13 +406,13 @@ export const createBooking = async (req, res) => {
 
     // 5. Setup Locations (default to car's location if not provided)
     const finalPickup = {
-      address: pickupLocation?.address || selectedCar.location.address,
+      address: pickupLocation?.address || buildFallbackLocationAddress(selectedCar),
       coordinates: pickupLocation?.coordinates || selectedCar.location.coordinates,
       instructions: pickupLocation?.instructions || 'Standard pickup at owner location'
     };
 
     const finalReturn = {
-      address: returnLocation?.address || selectedCar.location.address,
+      address: returnLocation?.address || buildFallbackLocationAddress(selectedCar),
       coordinates: returnLocation?.coordinates || selectedCar.location.coordinates,
       instructions: returnLocation?.instructions || 'Standard return at owner location'
     };
@@ -311,6 +461,18 @@ export const createBooking = async (req, res) => {
 
   } catch (error) {
     console.error('Booking Creation Error:', error);
+
+    if (error.name === 'ValidationError') {
+      return res.status(400).json({
+        success: false,
+        message: 'Some booking details are missing or invalid.',
+        errors: Object.entries(error.errors).map(([field, value]) => ({
+          field,
+          message: value.message
+        }))
+      });
+    }
+
     res.status(500).json({
       success: false,
       message: 'An error occurred while creating the booking',
@@ -412,15 +574,28 @@ export const cancelBooking = async (req, res) => {
 // Get bookings where user is the customer
 export const getMyBookings = async (req, res) => {
   try {
-    const bookings = await Booking.find({ customer: req.user.id })
-      .populate('car', 'make model year images dailyRate')
-      .populate('owner', 'name email phone')
-      .sort({ createdAt: -1 });
+    const validationError = getRequestValidationError(req);
+    if (validationError) {
+      return res.status(400).json(validationError);
+    }
+
+    const scopedResult = await getScopedBookings({
+      req,
+      scope: { customer: req.user._id }
+    });
+
+    if (scopedResult.error) {
+      return res.status(400).json({
+        success: false,
+        message: scopedResult.error
+      });
+    }
 
     res.status(200).json({
       success: true,
-      count: bookings.length,
-      data: bookings
+      count: scopedResult.bookings.length,
+      pagination: buildBookingPagination(scopedResult.page, scopedResult.limit, scopedResult.total),
+      data: scopedResult.bookings.map(buildBookingResponse)
     });
   } catch (error) {
     res.status(500).json({
@@ -434,15 +609,28 @@ export const getMyBookings = async (req, res) => {
 // Get bookings for cars owned by the user
 export const getOwnerBookings = async (req, res) => {
   try {
-    const bookings = await Booking.find({ owner: req.user.id })
-      .populate('car', 'make model year images dailyRate')
-      .populate('customer', 'name email phone')
-      .sort({ createdAt: -1 });
+    const validationError = getRequestValidationError(req);
+    if (validationError) {
+      return res.status(400).json(validationError);
+    }
+
+    const scopedResult = await getScopedBookings({
+      req,
+      scope: { owner: req.user._id }
+    });
+
+    if (scopedResult.error) {
+      return res.status(400).json({
+        success: false,
+        message: scopedResult.error
+      });
+    }
 
     res.status(200).json({
       success: true,
-      count: bookings.length,
-      data: bookings
+      count: scopedResult.bookings.length,
+      pagination: buildBookingPagination(scopedResult.page, scopedResult.limit, scopedResult.total),
+      data: scopedResult.bookings.map(buildBookingResponse)
     });
   } catch (error) {
     res.status(500).json({

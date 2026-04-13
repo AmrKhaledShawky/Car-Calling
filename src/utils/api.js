@@ -3,11 +3,15 @@ const API_BASE_URL = import.meta.env.VITE_API_URL || '/api';
 
 export const apiCall = async (endpoint, options = {}) => {
   const token = localStorage.getItem('token');
+  const isFormData = options.body instanceof FormData;
   
   const headers = {
-    'Content-Type': 'application/json',
     ...options.headers,
   };
+
+  if (!isFormData) {
+    headers['Content-Type'] = headers['Content-Type'] || 'application/json';
+  }
 
   if (token) {
     headers['Authorization'] = `Bearer ${token}`;
@@ -42,7 +46,11 @@ export const apiCall = async (endpoint, options = {}) => {
 
     if (!response.ok) {
       console.error(`[API Error] ${response.status}: ${data.message}`);
-      throw new Error(data.message || `API Error: ${response.status}`);
+      const error = new Error(data.message || `API Error: ${response.status}`);
+      error.status = response.status;
+      error.details = Array.isArray(data.errors) ? data.errors : [];
+      error.response = data;
+      throw error;
     }
 
     return data;

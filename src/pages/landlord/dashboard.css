@@ -41,3 +41,18 @@
   margin-bottom: 20px;
   font-size: 16px;
 }
+
+.dashboard-status {
+  background: white;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.05);
+}
+
+.dashboard-error {
+  color: #b42318;
+}
+
+.dashboard-empty-text {
+  color: #667085;
+}

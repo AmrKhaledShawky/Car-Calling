@@ -34,10 +34,19 @@ const carSchema = new mongoose.Schema({
   },
   licensePlate: {
     type: String,
-    required: [true, 'License plate is required'],
     unique: true,
+    sparse: true,
     uppercase: true,
-    trim: true
+    trim: true,
+    default: undefined,
+    set: (value) => {
+      if (typeof value !== 'string') {
+        return undefined;
+      }
+
+      const normalizedValue = value.trim().toUpperCase();
+      return normalizedValue || undefined;
+    }
   },
 
   // Specifications
@@ -68,17 +77,20 @@ const carSchema = new mongoose.Schema({
   doors: {
     type: Number,
     required: [true, 'Number of doors is required'],
+    default: 4,
     min: [2, 'Must have at least 2 doors'],
     max: [5, 'Cannot have more than 5 doors']
   },
   color: {
     type: String,
     required: [true, 'Car color is required'],
-    trim: true
+    trim: true,
+    default: 'Unknown'
   },
   mileage: {
     type: Number,
     required: [true, 'Mileage is required'],
+    default: 0,
     min: [0, 'Mileage cannot be negative']
   },
 
@@ -126,7 +138,7 @@ const carSchema = new mongoose.Schema({
   location: {
     address: {
       type: String,
-      required: [true, 'Address is required']
+      default: ''
     },
     city: {
       type: String,
@@ -134,11 +146,11 @@ const carSchema = new mongoose.Schema({
     },
     state: {
       type: String,
-      required: [true, 'State is required']
+      default: ''
     },
     zipCode: {
       type: String,
-      required: [true, 'ZIP code is required']
+      default: ''
     },
     coordinates: {
       latitude: {

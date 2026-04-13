@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import "./login.css";
 import car from "../../assets/login.png";
 import { Eye, EyeOff } from "lucide-react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 
 export default function Login() {
@@ -12,6 +12,7 @@ export default function Login() {
   const [loading, setLoading] = useState(false);
   const { login } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -24,7 +25,7 @@ export default function Login() {
     setLoading(false);
 
     if (result.success) {
-      navigate(result.redirectTo || "/");
+      navigate(location.state?.redirectTo || result.redirectTo || "/");
     }
   };
 
@@ -95,7 +96,7 @@ export default function Login() {
           {/* SIGNUP */}
           <p className="login-signup">
             Don't have an account?
-            <Link to="/auth/register">Sign Up</Link>
+            <Link to="/auth/register" state={location.state}>Sign Up</Link>
           </p>
         </div>
       </div>

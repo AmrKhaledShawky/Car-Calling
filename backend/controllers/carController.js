@@ -2,6 +2,12 @@ import { validationResult } from 'express-validator';
 import Car from '../models/Car.js';
 import Booking from '../models/Booking.js';
 
+const getActiveRentalConflict = async (carId) => Booking.exists({
+  car: carId,
+  status: { $in: ['confirmed', 'active'] },
+  endDate: { $gte: new Date() }
+});
+
 // @desc    Get all cars with filtering and pagination
 // @route   GET /api/cars
 // @access  Public
@@ -111,13 +117,28 @@ export const createCar = async (req, res) => {
     if (!errors.isEmpty()) {
       return res.status(400).json({
         success: false,
-        message: 'Validation failed',
-        errors: errors.array()
+        message: 'Please fix the highlighted car details and try again.',
+        errors: errors.array().map((error) => ({
+          field: error.path,
+          message: error.msg
+        }))
       });
     }
 
     // Add owner to req.body
     req.body.owner = req.user._id;
+    req.body.licensePlate = req.body.licensePlate || undefined;
+    req.body.color = req.body.color || 'Unknown';
+    req.body.mileage = req.body.mileage ?? 0;
+    req.body.doors = req.body.doors ?? 4;
+    req.body.isAvailable = req.body.status === 'available';
+    req.body.location = {
+      address: req.body.location?.address || '',
+      city: req.body.location?.city,
+      state: req.body.location?.state || '',
+      zipCode: req.body.location?.zipCode || '',
+      coordinates: req.body.location?.coordinates
+    };
 
     const car = await Car.create(req.body);
 
@@ -127,6 +148,34 @@ export const createCar = async (req, res) => {
     });
   } catch (error) {
     console.error('Create car error:', error);
+
+    if (error.name === 'ValidationError') {
+      return res.status(400).json({
+        success: false,
+        message: 'Some car details still need attention.',
+        errors: Object.entries(error.errors).map(([field, value]) => ({
+          field,
+          message: value.message
+        }))
+      });
+    }
+
+    if (error.code === 11000) {
+      const duplicateField = Object.keys(error.keyValue || {})[0];
+      const fieldLabels = {
+        vin: 'VIN',
+        licensePlate: 'license plate'
+      };
+
+      return res.status(400).json({
+        success: false,
+        message: `This ${fieldLabels[duplicateField] || duplicateField} is already in use.`,
+        errors: duplicateField
+          ? [{ field: duplicateField, message: `This ${fieldLabels[duplicateField] || duplicateField} already exists.` }]
+          : []
+      });
+    }
+
     res.status(500).json({
       success: false,
       message: 'Server error'
@@ -156,6 +205,31 @@ export const updateCar = async (req, res) => {
       });
     }
 
+    const nextStatus = req.body.status || car.status;
+    if (nextStatus !== car.status) {
+      const hasProtectedBooking = await getActiveRentalConflict(req.params.id);
+
+      if (hasProtectedBooking) {
+        return res.status(400).json({
+          success: false,
+          message: 'You cannot change the status while this car has a confirmed or active rental period.'
+        });
+      }
+    }
+
+    req.body.licensePlate = req.body.licensePlate || undefined;
+    req.body.color = req.body.color || 'Unknown';
+    req.body.mileage = req.body.mileage ?? 0;
+    req.body.doors = req.body.doors ?? 4;
+    req.body.isAvailable = req.body.status === 'available';
+    req.body.location = {
+      address: req.body.location?.address || '',
+      city: req.body.location?.city || car.location?.city,
+      state: req.body.location?.state || '',
+      zipCode: req.body.location?.zipCode || '',
+      coordinates: req.body.location?.coordinates || car.location?.coordinates
+    };
+
     car = await Car.findByIdAndUpdate(req.params.id, req.body, {
       new: true,
       runValidators: true
@@ -167,6 +241,34 @@ export const updateCar = async (req, res) => {
     });
   } catch (error) {
     console.error('Update car error:', error);
+
+    if (error.name === 'ValidationError') {
+      return res.status(400).json({
+        success: false,
+        message: 'Some car details still need attention.',
+        errors: Object.entries(error.errors).map(([field, value]) => ({
+          field,
+          message: value.message
+        }))
+      });
+    }
+
+    if (error.code === 11000) {
+      const duplicateField = Object.keys(error.keyValue || {})[0];
+      const fieldLabels = {
+        vin: 'VIN',
+        licensePlate: 'license plate'
+      };
+
+      return res.status(400).json({
+        success: false,
+        message: `This ${fieldLabels[duplicateField] || duplicateField} is already in use.`,
+        errors: duplicateField
+          ? [{ field: duplicateField, message: `This ${fieldLabels[duplicateField] || duplicateField} already exists.` }]
+          : []
+      });
+    }
+
     res.status(500).json({
       success: false,
       message: 'Server error'
@@ -232,10 +334,23 @@ export const getMyCars = async (req, res) => {
     const cars = await Car.find({ owner: req.user._id })
       .sort({ createdAt: -1 });
 
+    const lockedCarIds = new Set(
+      (
+        await Booking.find({
+          owner: req.user._id,
+          status: { $in: ['confirmed', 'active'] },
+          endDate: { $gte: new Date() }
+        }).select('car')
+      ).map((booking) => booking.car.toString())
+    );
+
     res.status(200).json({
       success: true,
       count: cars.length,
-      data: cars
+      data: cars.map((car) => ({
+        ...car.toObject({ virtuals: true }),
+        statusLocked: lockedCarIds.has(car._id.toString())
+      }))
     });
   } catch (error) {
     console.error('Get my cars error:', error);

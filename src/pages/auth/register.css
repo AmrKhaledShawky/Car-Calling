@@ -97,6 +97,17 @@
   color:#777;
 }
 
+.register-info-banner{
+  margin-top:12px;
+  padding:12px 14px;
+  border-radius:12px;
+  background:#fff3e8;
+  color:#8b3a00;
+  border:1px solid #ffd2b3;
+  font-size:13px;
+  line-height:1.5;
+}
+
 .register-avatar-upload{
   width:48px;
   height:48px;

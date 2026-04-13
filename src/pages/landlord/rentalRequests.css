@@ -1,11 +1,35 @@
 .requests-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
   margin-bottom: 20px;
+}
+
+.requests-header h2 {
+  margin: 0;
+}
+
+.requests-header p {
+  margin: 8px 0 0;
+  color: #667085;
+}
+
+.requests-page-status,
+.requests-empty-state {
+  background: white;
+  padding: 20px;
+  border-radius: 12px;
+}
+
+.requests-page-error {
+  color: #b42318;
 }
 
 .requests-table-wrapper {
   background: white;
   padding: 20px;
   border-radius: 12px;
+  overflow-x: auto;
 }
 
 .requests-table {
@@ -45,6 +69,17 @@
   color: #721c24;
 }
 
+.status.confirmed {
+  background: #d4edda;
+  color: #155724;
+}
+
+.status.cancelled,
+.status.unknown {
+  background: #f3f4f6;
+  color: #475467;
+}
+
 .actions svg {
   cursor: pointer;
   margin-right: 10px;
@@ -56,4 +91,16 @@
 
 .reject-icon {
   color: red;
+}
+
+.requests-history-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 40px;
+  padding: 0 16px;
+  border-radius: 999px;
+  background: #6b0202;
+  color: white;
+  text-decoration: none;
 }

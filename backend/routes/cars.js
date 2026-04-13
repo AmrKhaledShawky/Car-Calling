@@ -31,9 +31,8 @@ const carValidation = [
     .matches(/^[A-HJ-NPR-Z0-9]{17}$/)
     .withMessage('Please provide a valid 17-character VIN'),
   body('licensePlate')
-    .trim()
-    .notEmpty()
-    .withMessage('License plate is required'),
+    .optional({ values: 'falsy' })
+    .trim(),
   body('category')
     .isIn(['sedan', 'suv', 'truck', 'coupe', 'convertible', 'hatchback', 'wagon', 'van', 'luxury', 'sports'])
     .withMessage('Please provide a valid category'),
@@ -47,34 +46,32 @@ const carValidation = [
     .isInt({ min: 1, max: 9 })
     .withMessage('Seats must be between 1 and 9'),
   body('doors')
+    .optional({ values: 'falsy' })
     .isInt({ min: 2, max: 5 })
     .withMessage('Doors must be between 2 and 5'),
   body('color')
-    .trim()
-    .notEmpty()
-    .withMessage('Color is required'),
+    .optional({ values: 'falsy' })
+    .trim(),
   body('mileage')
+    .optional({ values: 'falsy' })
     .isFloat({ min: 0 })
     .withMessage('Mileage must be a positive number'),
   body('dailyRate')
     .isFloat({ min: 0 })
     .withMessage('Daily rate must be a positive number'),
-  body('location.address')
-    .trim()
-    .notEmpty()
-    .withMessage('Address is required'),
   body('location.city')
     .trim()
     .notEmpty()
     .withMessage('City is required'),
+  body('location.address')
+    .optional({ values: 'falsy' })
+    .trim(),
   body('location.state')
-    .trim()
-    .notEmpty()
-    .withMessage('State is required'),
+    .optional({ values: 'falsy' })
+    .trim(),
   body('location.zipCode')
+    .optional({ values: 'falsy' })
     .trim()
-    .notEmpty()
-    .withMessage('ZIP code is required')
 ];
 
 const carIdValidation = [

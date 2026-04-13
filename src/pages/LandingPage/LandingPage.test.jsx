@@ -95,7 +95,7 @@ describe('LandingPage Integration Tests', () => {
     const viewDetailsLinks = screen.getAllByRole('link', { name: /view details/i })
     expect(viewDetailsLinks.length).toBeGreaterThan(0)
     viewDetailsLinks.forEach(link => {
-      expect(link.getAttribute('href')).toMatch(/^\/car\/\d+$/)
+      expect(link.getAttribute('href')).toBe('/browse-cars')
     })
   })
 
