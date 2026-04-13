@@ -1,101 +1,126 @@
-import { useState, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import AdminLayout from "../../components/layout/AdminLayout";
+import { apiCall } from "../../utils/api";
 import "./review.css";
-import { FaEye, FaThumbsUp, FaStar } from "react-icons/fa";
+import { FaEye, FaStar } from "react-icons/fa";
+
+const renderStars = (rating) => {
+  const stars = [];
+  for (let index = 1; index <= 5; index += 1) {
+    stars.push(<FaStar key={index} color={index <= rating ? "#FFD700" : "#ccc"} />);
+  }
+  return stars;
+};
 
 const AdminReviews = () => {
   const [selectedUser, setSelectedUser] = useState(null);
-  const [usersData, setUsersData] = useState(useMemo(() => [
-    {
-      id: 1,
-      name: "Ahmed Ali",
-      email: "ahmed@gmail.com",
-      phone: "01012345678",
-      reviews: [
-        { id: 1, text: "Great service!", date: "2026-03-01", rating: 5 },
-        { id: 2, text: "Car was dirty", date: "2026-03-05", rating: 3 }
-      ]
-    },
-    {
-      id: 2,
-      name: "Sara Mohamed",
-      email: "sara@gmail.com",
-      phone: "01198765432",
-      reviews: [
-        { id: 1, text: "Very polite driver", date: "2026-02-10", rating: 4 }
-      ]
-    }
-  ], []));
+  const [reviewGroups, setReviewGroups] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
-  const [notification, setNotification] = useState("");
+  useEffect(() => {
+    const loadReviews = async () => {
+      try {
+        setLoading(true);
+        setError("");
+        const response = await apiCall("/admin/bookings");
+        const bookings = response.data || [];
+        const grouped = new Map();
 
-  const showNotification = (msg) => {
-    setNotification(msg);
-    setTimeout(() => setNotification(""), 3000);
-  };
+        bookings.forEach((booking) => {
+          const reviews = [];
 
-  // Handler: React & remove review
-  const handleReact = (userId, reviewId) => {
-    const user = usersData.find(u => u.id === userId);
-    const review = user.reviews.find(r => r.id === reviewId);
+          if (booking.customerReview) {
+            reviews.push({
+              id: `${booking._id}-customer`,
+              text: booking.customerReview,
+              date: booking.createdAt,
+              rating: booking.customerRating || 0,
+              source: "Customer"
+            });
+          }
 
-    // Simulate notifying the user (could be replaced with API call)
-    alert(`Notification sent to ${user.name}: Your review "${review.text}" received a reaction!`);
+          if (booking.ownerReview) {
+            reviews.push({
+              id: `${booking._id}-owner`,
+              text: booking.ownerReview,
+              date: booking.createdAt,
+              rating: booking.ownerRating || 0,
+              source: "Owner"
+            });
+          }
 
-    // Remove review & notify admin
-    setUsersData(prev => prev.map(u => {
-      if (u.id === userId) {
-        return { ...u, reviews: u.reviews.filter(r => r.id !== reviewId) };
+          if (reviews.length === 0) {
+            return;
+          }
+
+          const userId = booking.customer?._id || booking.customer?.id || booking.customer?.email;
+          const current = grouped.get(userId) || {
+            id: userId,
+            name: booking.customer?.name || "Unknown user",
+            email: booking.customer?.email || "N/A",
+            phone: booking.customer?.phone || "N/A",
+            reviews: []
+          };
+
+          current.reviews.push(...reviews);
+          grouped.set(userId, current);
+        });
+
+        setReviewGroups(Array.from(grouped.values()));
+      } catch (loadError) {
+        setError(loadError.message || "Failed to load reviews.");
+      } finally {
+        setLoading(false);
       }
-      return u;
-    }));
+    };
 
-    showNotification(`You reacted to review: "${review.text}"`);
-  };
+    loadReviews();
+  }, []);
 
-  const renderStars = (rating) => {
-    const stars = [];
-    for (let i = 1; i <= 5; i++) {
-      stars.push(<FaStar key={i} color={i <= rating ? "#FFD700" : "#ccc"} />);
-    }
-    return stars;
-  };
+  const selectedReviews = useMemo(() => selectedUser?.reviews || [], [selectedUser]);
 
   return (
     <AdminLayout>
       <div className="reviews-container">
+        {loading ? <p>Loading reviews...</p> : null}
+        {error ? <p>{error}</p> : null}
 
-        {notification && <div className="notification">{notification}</div>}
-
-        <table className="reviews-table">
-          <thead>
-            <tr>
-              <th>User</th>
-              <th>Email</th>
-              <th>Phone</th>
-              <th>Total Reviews</th>
-              <th>View</th>
-            </tr>
-          </thead>
-          <tbody>
-            {usersData.map(user => (
-              <tr key={user.id}>
-                <td>{user.name}</td>
-                <td>{user.email}</td>
-                <td>{user.phone}</td>
-                <td>{user.reviews.length}</td>
-                <td>
-                  <button className="view-btn" onClick={() => setSelectedUser(user)}>
-                    <FaEye />
-                  </button>
-                </td>
+        {!loading && !error ? (
+          <table className="reviews-table">
+            <thead>
+              <tr>
+                <th>User</th>
+                <th>Email</th>
+                <th>Phone</th>
+                <th>Total Reviews</th>
+                <th>View</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {reviewGroups.map((user) => (
+                <tr key={user.id}>
+                  <td>{user.name}</td>
+                  <td>{user.email}</td>
+                  <td>{user.phone}</td>
+                  <td>{user.reviews.length}</td>
+                  <td>
+                    <button className="view-btn" onClick={() => setSelectedUser(user)}>
+                      <FaEye />
+                    </button>
+                  </td>
+                </tr>
+              ))}
+              {reviewGroups.length === 0 ? (
+                <tr>
+                  <td colSpan={5} style={{ textAlign: "center" }}>No reviews found in the database.</td>
+                </tr>
+              ) : null}
+            </tbody>
+          </table>
+        ) : null}
 
-        {/* Modal for Reviews */}
-        {selectedUser && (
+        {selectedUser ? (
           <div className="modal-overlay">
             <div className="modal">
               <h3>Reviews for {selectedUser.name}</h3>
@@ -106,38 +131,25 @@ const AdminReviews = () => {
                     <th>Review</th>
                     <th>Date</th>
                     <th>Rating</th>
-                    <th>React</th>
+                    <th>Source</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {selectedUser.reviews.map(review => (
+                  {selectedReviews.map((review) => (
                     <tr key={review.id}>
                       <td>{review.text}</td>
-                      <td>{review.date}</td>
+                      <td>{review.date ? new Date(review.date).toLocaleDateString() : "N/A"}</td>
                       <td>{renderStars(review.rating)}</td>
-                      <td>
-                        <button
-                          className="react-btn"
-                          onClick={() => handleReact(selectedUser.id, review.id)}
-                        >
-                          <FaThumbsUp />
-                        </button>
-                      </td>
+                      <td>{review.source}</td>
                     </tr>
                   ))}
-                  {selectedUser.reviews.length === 0 && (
-                    <tr>
-                      <td colSpan={4} style={{ textAlign: "center" }}>No reviews left</td>
-                    </tr>
-                  )}
                 </tbody>
               </table>
 
               <button className="close-btn" onClick={() => setSelectedUser(null)}>Close</button>
             </div>
           </div>
-        )}
-
+        ) : null}
       </div>
     </AdminLayout>
   );

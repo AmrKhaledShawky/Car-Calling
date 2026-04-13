@@ -32,12 +32,20 @@ vi.mock('../pages/LandingPage/LandingPage', () => ({
   default: () => <div data-testid="landing-page">Landing Page</div>
 }))
 
-vi.mock('../pages/BrowseCar/BrowseCar', () => ({
+vi.mock('../pages/BrowseCar/BrowseCarReal', () => ({
   default: () => <div data-testid="browse-cars-page">Browse Cars Page</div>
 }))
 
-vi.mock('../pages/CarDetails/CarDetails', () => ({
+vi.mock('../pages/CarDetails/CarDetailsReal', () => ({
   default: () => <div data-testid="car-details-page">Car Details Page</div>
+}))
+
+vi.mock('../pages/UserMyRents', () => ({
+  default: () => <div data-testid="user-my-rents-page">User My Rents Page</div>
+}))
+
+vi.mock('../pages/UserProfile', () => ({
+  default: () => <div data-testid="user-profile-page">User Profile Page</div>
 }))
 
 // Mock admin pages

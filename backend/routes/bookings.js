@@ -1,5 +1,5 @@
 import express from 'express';
-import { body, param } from 'express-validator';
+import { body, param, query } from 'express-validator';
 import {
   getBookings,
   getBooking,
@@ -11,7 +11,7 @@ import {
   confirmBooking,
   completeBooking
 } from '../controllers/bookingController.js';
-import { protect, authorize, ownerOrAdmin } from '../middleware/auth.js';
+import { protect, authorize } from '../middleware/auth.js';
 
 const router = express.Router();
 
@@ -52,22 +52,47 @@ const bookingIdValidation = [
     .withMessage('Please provide a valid booking ID')
 ];
 
+const bookingListValidation = [
+  query('status')
+    .optional()
+    .isIn(['pending', 'confirmed', 'active', 'completed', 'cancelled', 'no_show'])
+    .withMessage('Please provide a valid booking status'),
+  query('date')
+    .optional()
+    .isISO8601()
+    .withMessage('Please provide a valid date filter'),
+  query('startDate')
+    .optional()
+    .isISO8601()
+    .withMessage('Please provide a valid startDate filter'),
+  query('endDate')
+    .optional()
+    .isISO8601()
+    .withMessage('Please provide a valid endDate filter'),
+  query('page')
+    .optional()
+    .isInt({ min: 1 })
+    .withMessage('Page must be a positive integer'),
+  query('limit')
+    .optional()
+    .isInt({ min: 1, max: 100 })
+    .withMessage('Limit must be between 1 and 100')
+];
+
 // All routes require authentication
 router.use(protect);
 
 // Shared/General booking routes (Controller handles fine-grained authorization)
-router.get('/my-bookings', getMyBookings);
+router.get('/my-bookings', bookingListValidation, getMyBookings);
+router.get('/owner-bookings', authorize('landlord'), bookingListValidation, getOwnerBookings);
 router.post('/', bookingValidation, createBooking);
+router.put('/:id/confirm', authorize('landlord'), bookingIdValidation, confirmBooking);
+router.put('/:id/complete', authorize('landlord'), bookingIdValidation, completeBooking);
 router.get('/:id', bookingIdValidation, getBooking);
 router.put('/:id', bookingIdValidation, updateBooking);
 router.put('/:id/cancel', bookingIdValidation, cancelBooking);
 
-// Owner routes (for landlords)
-router.get('/owner-bookings', authorize('landlord'), getOwnerBookings);
-router.put('/:id/confirm', authorize('landlord'), bookingIdValidation, confirmBooking);
-router.put('/:id/complete', authorize('landlord'), bookingIdValidation, completeBooking);
-
 // Admin routes
-router.get('/', authorize('admin'), getBookings);
+router.get('/', authorize('admin'), bookingListValidation, getBookings);
 
 export default router;

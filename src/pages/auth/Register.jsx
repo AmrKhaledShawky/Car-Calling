@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import "./register.css";
 import { Camera } from "lucide-react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 
 export default function Register() {
@@ -11,6 +11,7 @@ export default function Register() {
   const [loading, setLoading] = useState(false);
   const { register } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
 
   const [formData, setFormData] = useState({
     name: "",
@@ -80,7 +81,7 @@ export default function Register() {
     setLoading(false);
 
     if (result.success) {
-      navigate(result.redirectTo || "/");
+      navigate(location.state?.redirectTo || result.redirectTo || "/");
     }
   };
 
@@ -138,6 +139,9 @@ export default function Register() {
               <div>
                 <h1>Create Your Account</h1>
                 <p>Enter your details to get started with Car Calling.</p>
+                {location.state?.message ? (
+                  <div className="register-info-banner">{location.state.message}</div>
+                ) : null}
               </div>
 
               <div
@@ -251,7 +255,7 @@ export default function Register() {
           <p className="register-login-link">
 
             Already have an account?
-            <Link to="/login">
+            <Link to="/login" state={location.state}>
               Log In
             </Link>
 

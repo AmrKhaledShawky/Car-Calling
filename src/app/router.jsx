@@ -1,15 +1,16 @@
 import { BrowserRouter, Navigate, Routes, Route } from "react-router-dom";
 import Login from "../pages/auth/Login";
-import LandlordDashboard from "../pages/landlord/Dashboard";
-import MyCars from "../pages/landlord/MyCars";
-import RentalRequests from "../pages/landlord/RentalRequests";
+import LandlordDashboard from "../pages/landlord/DashboardReal";
+import MyCars from "../pages/landlord/MyCarsReal";
+import RentalRequests from "../pages/landlord/RentalRequestsReal";
+import RentalHistory from "../pages/landlord/RentalHistoryReal";
 import Settings from "../pages/landlord/Settings";
 import Profile from "../pages/landlord/Profile";
 import Register from "../pages/auth/Register";
 import Privacy from "../pages/privacy";
 import LandingPage from "../pages/LandingPage/LandingPage";
-import BrowseCars from "../pages/BrowseCar/BrowseCar";
-import CarDetails from "../pages/CarDetails/CarDetails";
+import BrowseCars from "../pages/BrowseCar/BrowseCarReal";
+import CarDetails from "../pages/CarDetails/CarDetailsReal";
 import CarOwner from "../pages/admin/Carowner";
 import AddCar from "../pages/admin/addcar";
 import DeleteCar from "../pages/admin/deletecar";
@@ -27,6 +28,8 @@ import Report from "../pages/admin/report";
 import ProtectedRoute from "../routes/ProtectedRoute";
 import { useAuth } from "../context/AuthContext";
 import { getAuthorizedRoute } from "../utils/auth";
+import UserMyRents from "../pages/UserMyRents";
+import UserProfile from "../pages/UserProfile";
 
 function Router() {
   const { isAuthenticated, user, loading } = useAuth();
@@ -51,6 +54,22 @@ function Router() {
         <Route path="/auth/register" element={renderAuthPage(Register)} />
         <Route path="/privacy" element={<Privacy />} />
         <Route
+          path="/my-rents"
+          element={
+            <ProtectedRoute>
+              <UserMyRents />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/profile"
+          element={
+            <ProtectedRoute>
+              <UserProfile />
+            </ProtectedRoute>
+          }
+        />
+        <Route
           path="/landlord/dashboard"
           element={
             <ProtectedRoute allowedRoles={["landlord"]}>
@@ -71,6 +90,14 @@ function Router() {
           element={
             <ProtectedRoute allowedRoles={["landlord"]}>
               <RentalRequests />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/landlord/rental-history"
+          element={
+            <ProtectedRoute allowedRoles={["landlord"]}>
+              <RentalHistory />
             </ProtectedRoute>
           }
         />

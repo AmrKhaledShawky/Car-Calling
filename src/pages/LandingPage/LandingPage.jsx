@@ -90,7 +90,7 @@ const LandingPage = () => {
                                     Daily Rate<br />
                                     <span>E£ 1,200</span> / day
                                 </div>
-                                <Link to="/car/1" className="btn-details">View Details</Link>
+                                <Link to="/browse-cars" className="btn-details">View Details</Link>
                             </div>
                         </div>
                     </div>
@@ -116,7 +116,7 @@ const LandingPage = () => {
                                     Daily Rate<br />
                                     <span>E£ 1,100</span> / day
                                 </div>
-                                <Link to="/car/2" className="btn-details">View Details</Link>
+                                <Link to="/browse-cars" className="btn-details">View Details</Link>
                             </div>
                         </div>
                     </div>
@@ -142,7 +142,7 @@ const LandingPage = () => {
                                     Daily Rate<br />
                                     <span>E£ 1,500</span> / day
                                 </div>
-                                <Link to="/car/3" className="btn-details">View Details</Link>
+                                <Link to="/browse-cars" className="btn-details">View Details</Link>
                             </div>
                         </div>
                     </div>

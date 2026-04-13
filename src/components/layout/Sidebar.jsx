@@ -1,8 +1,8 @@
 import {
   Home,
   Car,
-  PlusCircle,
   Package,
+  History,
   Settings,
   LogOut,
   Menu
@@ -45,6 +45,11 @@ export default function Sidebar({ collapsed, setCollapsed }) {
         <NavLink to="/landlord/rental-requests">
           <Package size={18} />
           <span>Rental Requests</span>
+        </NavLink>
+
+        <NavLink to="/landlord/rental-history">
+          <History size={18} />
+          <span>Rental History</span>
         </NavLink>
 
         <NavLink to="/landlord/settings">

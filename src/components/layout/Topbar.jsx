@@ -6,13 +6,14 @@ import "./Topbar.css";
 export default function Topbar() {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const displayUser = user || { name: "Landlord Name", role: "landlord" };
+  const displayName = user?.name || "My Account";
+  const displayRole = user?.role || "";
 
   return (
     <div className="topbar">
       <div className="topbar-identity">
-        <h2>{displayUser.name}</h2>
-        <span className="topbar-role">{displayUser.role}</span>
+        <h2>{displayName}</h2>
+        <span className="topbar-role">{displayRole}</span>
       </div>
 
       <div className="topbar-right">

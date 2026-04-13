@@ -1,101 +1,68 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useEffect, useState } from "react";
 import AdminLayout from "../../components/layout/AdminLayout";
-import { Edit, Trash2, Plus } from "lucide-react";
+import { apiCall } from "../../utils/api";
 import "./CarOwner.css";
 
-const initialCarOwners = [
-  {
-    id: 1,
-    name: "Ahmed Ali",
-    email: "ahmed@example.com",
-    phone: "01012345678",
-    cars: 2,
-    status: "Active",
-    lastCar: { model: "BMW X5", year: 2024 }
-  },
-  {
-    id: 2,
-    name: "Sara Mohamed",
-    email: "sara@example.com",
-    phone: "01098765432",
-    cars: 1,
-    status: "Pending",
-    lastCar: { model: "Audi A4", year: 2023 }
-  },
-  {
-    id: 3,
-    name: "Omar Hassan",
-    email: "omar@example.com",
-    phone: "01122334455",
-    cars: 3,
-    status: "Inactive",
-    lastCar: { model: "Toyota Corolla", year: 2025 }
-  }
-];
-
 const CarOwner = () => {
-  const [owners, setOwners] = useState(initialCarOwners);
-  const navigate = useNavigate();
+  const [owners, setOwners] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
-  const handleAdd = () => {
-    navigate("/addcar"); // رابط Add Car Owner
-  };
+  useEffect(() => {
+    const loadOwners = async () => {
+      try {
+        setLoading(true);
+        setError("");
+        const response = await apiCall("/admin/users?role=landlord");
+        setOwners(response.data || []);
+      } catch (loadError) {
+        setError(loadError.message || "Failed to load car owners.");
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  const handleEdit = (id) => {
-    navigate(`/editcar/${id}`); // رابط Edit Car Owner
-  };
-
-  const handleDelete = (id) => {
-    navigate(`/deletecar/${id}`); // رابط Delete Car Owner
-  };
+    loadOwners();
+  }, []);
 
   return (
     <AdminLayout>
       <div className="carowner-content">
-        <div className="carowner-header">
-          <button className="add-btn" onClick={handleAdd}>
-            <Plus size={16} /> Add Car Owner
-          </button>
-        </div>
-
-        <table className="carowner-table">
-          <thead>
-            <tr>
-              <th>Name</th>
-              <th>Email</th>
-              <th>Phone</th>
-              <th>Cars Owned</th>
-              <th>Last Car</th>
-              <th>Status</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {owners.map((owner) => (
-              <tr key={owner.id}>
-                <td>{owner.name}</td>
-                <td>{owner.email}</td>
-                <td>{owner.phone}</td>
-                <td>{owner.cars}</td>
-                <td>{owner.lastCar.model} ({owner.lastCar.year})</td>
-                <td className={`status ${owner.status.replace(" ","").toLowerCase()}`}>
-                  {owner.status}
-                </td>
-                <td>
-                  <Edit
-                    className="action-icon edit"
-                    onClick={() => handleEdit(owner.id)}
-                  />
-                  <Trash2
-                    className="action-icon delete"
-                    onClick={() => handleDelete(owner.id)}
-                  />
-                </td>
+        {loading ? <p>Loading car owners...</p> : null}
+        {error ? <p>{error}</p> : null}
+        {!loading && !error ? (
+          <table className="carowner-table">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Phone</th>
+                <th>Cars Owned</th>
+                <th>Last Car</th>
+                <th>Status</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {owners.map((owner) => (
+                <tr key={owner._id}>
+                  <td>{owner.name}</td>
+                  <td>{owner.email}</td>
+                  <td>{owner.phone || "N/A"}</td>
+                  <td>{owner.carCount || 0}</td>
+                  <td>{owner.lastCar ? `${owner.lastCar.model} (${owner.lastCar.year})` : "No cars yet"}</td>
+                  <td className={`status ${owner.isActive ? "active" : "inactive"}`}>
+                    {owner.isActive ? "Active" : "Inactive"}
+                  </td>
+                </tr>
+              ))}
+              {owners.length === 0 ? (
+                <tr>
+                  <td colSpan={6}>No car owners found.</td>
+                </tr>
+              ) : null}
+            </tbody>
+          </table>
+        ) : null}
       </div>
     </AdminLayout>
   );

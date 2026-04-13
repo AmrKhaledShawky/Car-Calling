@@ -1,5 +1,6 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import AdminLayout from "../../components/layout/AdminLayout";
+import { apiCall } from "../../utils/api";
 
 import { 
   DollarSign,
@@ -28,83 +29,52 @@ import {
 
 import "./Admindashboard.css";
 
-const kpiCards = [
-  { title: "Total Revenue", value: 150865, icon: <DollarSign size={28}/> },
-  { title: "Total Cars", value: 2500, icon: <Car size={28}/> },
-  { title: "Total Users", value: 2000, icon: <Users size={28}/> },
-  { title: "Total Cost", value: 1000000, icon: <Truck size={28}/> },
-  { title: "Total Cars Available", value: 2450, icon: <CheckCircle size={28}/> },
-  { title: "Total Cars Rented", value: 1900, icon: <Car size={28}/> },
-  { title: "Overdue Bookings", value: 60, icon: <AlertCircle size={28}/> }
-];
-
-const monthlyData = [
-  { month: "Jan", revenue: 20000, cost: 12000, overdue: 5, users: 100 },
-  { month: "Feb", revenue: 25000, cost: 14000, overdue: 8, users: 120 },
-  { month: "Mar", revenue: 30000, cost: 15000, overdue: 6, users: 140 },
-  { month: "Apr", revenue: 28000, cost: 13000, overdue: 7, users: 160 },
-  { month: "May", revenue: 35000, cost: 18000, overdue: 10, users: 200 },
-  { month: "Jun", revenue: 40000, cost: 20000, overdue: 9, users: 220 },
-  { month: "Jul", revenue: 42000, cost: 21000, overdue: 12, users: 250 },
-  { month: "Aug", revenue: 38000, cost: 19000, overdue: 11, users: 230 },
-  { month: "Sep", revenue: 36000, cost: 17000, overdue: 7, users: 210 },
-  { month: "Oct", revenue: 45000, cost: 22000, overdue: 6, users: 260 },
-  { month: "Nov", revenue: 47000, cost: 23000, overdue: 5, users: 280 },
-  { month: "Dec", revenue: 50000, cost: 25000, overdue: 4, users: 300 }
-];
-const driversData = [
-  {
-    name: "Ahmed Ali",
-    car: "Toyota Corolla",
-    from: "Cairo",
-    to: "Alexandria",
-    price: 500,
-    date: "12 Jan",
-    status: "On Trip"
-  },
-  {
-    name: "Mohamed Hassan",
-    car: "Kia Sportage",
-    from: "Giza",
-    to: "Hurghada",
-    price: 1200,
-    date: "14 Jan",
-    status: "Cancelled"
-  },
-  {
-    name: "Mahmoud Samy",
-    car: "Hyundai Elantra",
-    from: "Nasr City",
-    to: "New Cairo",
-    price: 200,
-    date: "10 Jan",
-    status: "Maintenance"
-  },
-  {
-    name: "Omar Khaled",
-    car: "Nissan Sunny",
-    from: "Dokki",
-    to: "Maadi",
-    price: 150,
-    date: "11 Jan",
-    status: "Completed"
-  }
-];
-
-const totalRevenue = monthlyData.reduce((a,b)=>a+b.revenue,0);
-const totalCost = monthlyData.reduce((a,b)=>a+b.cost,0);
-
-const profitData = [
-  { name: "Revenue", value: totalRevenue },
-  { name: "Cost", value: totalCost },
-  { name: "Profit", value: totalRevenue - totalCost }
-];
-
 const COLORS = ["#4CAF50", "#FF9800", "#2196F3"];
 
+const formatDate = (value) => (value ? new Date(value).toLocaleDateString() : "N/A");
+
 const AdminDashboard = () => {
+  const [dashboardData, setDashboardData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    const loadDashboard = async () => {
+      try {
+        setLoading(true);
+        setError("");
+        const response = await apiCall("/admin/dashboard/stats");
+        setDashboardData(response.data);
+      } catch (loadError) {
+        setError(loadError.message || "Failed to load dashboard data.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadDashboard();
+  }, []);
+
+  const kpis = dashboardData?.kpis || {};
+  const monthlyData = dashboardData?.monthlyData || [];
+  const profitData = dashboardData?.profitData || [];
+  const recentBookings = dashboardData?.recentBookings || [];
+  const kpiCards = [
+    { title: "Total Revenue", value: kpis.totalRevenue || 0, icon: <DollarSign size={28}/> },
+    { title: "Total Cars", value: kpis.totalCars || 0, icon: <Car size={28}/> },
+    { title: "Total Users", value: kpis.totalUsers || 0, icon: <Users size={28}/> },
+    { title: "Total Landlords", value: kpis.totalLandlords || 0, icon: <Truck size={28}/> },
+    { title: "Cars Available", value: kpis.totalCarsAvailable || 0, icon: <CheckCircle size={28}/> },
+    { title: "Cars Rented", value: kpis.totalCarsRented || 0, icon: <Car size={28}/> },
+    { title: "Overdue Bookings", value: kpis.overdueBookings || 0, icon: <AlertCircle size={28}/> }
+  ];
+
   return (
     <AdminLayout>
+      {loading ? <p>Loading dashboard...</p> : null}
+      {error ? <p>{error}</p> : null}
+      {!loading && !error ? (
+        <>
       {/* KPI CARDS */}
       <div className="kpi-grid">
   {kpiCards.map((card, index) => (
@@ -116,7 +86,7 @@ const AdminDashboard = () => {
       </div>
 
       <p className="kpi-value">
-        {card.value.toLocaleString()}
+        {Number(card.value || 0).toLocaleString()}
       </p>
 
     </div>
@@ -198,38 +168,45 @@ const AdminDashboard = () => {
 
           </div>
           <div className="drivers-table-box">
-          <h3>Drivers Trips</h3>
+          <h3>Recent Rentals</h3>
           <table className="drivers-table">
               <thead>
                 <tr>
-                  <th>Driver</th>
+                  <th>Customer</th>
                   <th>Car</th>
-                  <th>From</th>
-                  <th>To</th>
-                  <th>Price</th>
-                  <th>Date</th>
+                  <th>Start</th>
+                  <th>End</th>
+                  <th>Total</th>
+                  <th>Created</th>
                   <th>Status</th>
                   </tr>
                   </thead>
                   <tbody>
-          {driversData.map((driver,index)=>(
-            <tr key={index}>
-              <td>{driver.name}</td>
-              <td>{driver.car}</td>
-              <td>{driver.from}</td>
-              <td>{driver.to}</td>
-              <td>${driver.price}</td>
-              <td>{driver.date}</td>
-              <td className={`status ${driver.status.replace(" ","").toLowerCase()}`}>
-                {driver.status}
+          {recentBookings.map((booking)=>(
+            <tr key={booking.id}>
+              <td>{booking.customer}</td>
+              <td>{booking.car}</td>
+              <td>{formatDate(booking.startDate)}</td>
+              <td>{formatDate(booking.endDate)}</td>
+              <td>${Number(booking.totalAmount || 0).toFixed(2)}</td>
+              <td>{formatDate(booking.createdAt)}</td>
+              <td className={`status ${String(booking.status || "").replace(" ","").toLowerCase()}`}>
+                {booking.status}
                 </td>
               </tr>
             ))}
+            {recentBookings.length === 0 ? (
+              <tr>
+                <td colSpan={7}>No bookings found.</td>
+              </tr>
+            ) : null}
         </tbody>
 </table>
 </div>
 
         </div>
+        </>
+      ) : null}
     </AdminLayout>
   );
 };
