@@ -17,6 +17,28 @@ import { apiCall } from "../../utils/api";
 import { useAuth } from "../../context/AuthContext";
 import "./CarDetails.css";
 
+const toDateOnly = (value) => {
+  const date = new Date(value);
+
+  if (Number.isNaN(date.getTime())) {
+    return null;
+  }
+
+  date.setHours(0, 0, 0, 0);
+  return date;
+};
+
+const formatRangeLabel = (startDate, endDate) => {
+  const start = toDateOnly(startDate);
+  const end = toDateOnly(endDate);
+
+  if (!start || !end) {
+    return "Unavailable slot";
+  }
+
+  return `${start.toLocaleDateString()} to ${end.toLocaleDateString()}`;
+};
+
 const getCarImage = (car) => car?.primaryImage?.url || car?.images?.[0]?.url || "";
 
 const getTomorrowDate = () => {
@@ -118,6 +140,31 @@ export default function CarDetailsReal() {
     };
   }, [car, formData]);
 
+  const unavailableRanges = useMemo(
+    () => (Array.isArray(car?.unavailableRanges) ? car.unavailableRanges : []),
+    [car]
+  );
+
+  const hasBlockedOverlap = useMemo(() => {
+    const startDate = toDateOnly(formData.startDate);
+    const endDate = toDateOnly(formData.endDate);
+
+    if (!startDate || !endDate || endDate <= startDate) {
+      return false;
+    }
+
+    return unavailableRanges.some((range) => {
+      const blockedStart = toDateOnly(range.startDate);
+      const blockedEnd = toDateOnly(range.endDate);
+
+      if (!blockedStart || !blockedEnd) {
+        return false;
+      }
+
+      return startDate < blockedEnd && endDate > blockedStart;
+    });
+  }, [formData.endDate, formData.startDate, unavailableRanges]);
+
   const images = useMemo(
     () => (car?.images?.length ? car.images.map((image) => image.url) : []),
     [car]
@@ -146,6 +193,11 @@ export default function CarDetailsReal() {
 
     if (!bookingPreview?.isValidRange || bookingPreview.duration < 1) {
       toast.error("Please choose a valid booking date range.");
+      return;
+    }
+
+    if (hasBlockedOverlap) {
+      toast.error("These dates overlap with an already approved rental.");
       return;
     }
 
@@ -352,6 +404,25 @@ export default function CarDetailsReal() {
                   </label>
                 </div>
 
+                {unavailableRanges.length > 0 ? (
+                  <div className="booking-unavailable-slots">
+                    <h4>Unavailable Approved Slots</h4>
+                    <div className="booking-slot-list">
+                      {unavailableRanges.map((range) => (
+                        <button key={range.id} type="button" className="booking-slot-chip" disabled>
+                          {formatRangeLabel(range.startDate, range.endDate)}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                ) : null}
+
+                {hasBlockedOverlap ? (
+                  <p className="booking-slot-warning">
+                    The selected dates overlap with a landlord-approved rental. Please choose another slot.
+                  </p>
+                ) : null}
+
                 <label className="booking-field">
                   <span>Insurance</span>
                   <select name="insuranceType" value={formData.insuranceType} onChange={handleInputChange}>
@@ -390,7 +461,7 @@ export default function CarDetailsReal() {
                   </div>
                 ) : null}
 
-                <button className="action-rent-btn" type="button" onClick={handleBooking} disabled={submitting}>
+                <button className="action-rent-btn" type="button" onClick={handleBooking} disabled={submitting || hasBlockedOverlap}>
                   {submitting ? "Submitting..." : isAuthenticated ? "Rent Now" : "Sign Up To Rent"}
                   <ArrowRight size={20} className="r-arrow" />
                 </button>

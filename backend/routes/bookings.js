@@ -52,10 +52,25 @@ const bookingIdValidation = [
     .withMessage('Please provide a valid booking ID')
 ];
 
+const cancelBookingValidation = [
+  ...bookingIdValidation,
+  body('reason')
+    .optional()
+    .isIn(['customer_request', 'owner_cancelled', 'owner_rejected', 'payment_failed', 'system_cancelled', 'no_show'])
+    .withMessage('Please provide a valid cancellation reason'),
+  body('cancellationDetails')
+    .optional()
+    .isString()
+    .withMessage('Cancellation details must be text')
+    .trim()
+    .isLength({ min: 1, max: 500 })
+    .withMessage('Cancellation details must be between 1 and 500 characters')
+];
+
 const bookingListValidation = [
   query('status')
     .optional()
-    .isIn(['pending', 'confirmed', 'active', 'completed', 'cancelled', 'no_show'])
+    .isIn(['pending', 'confirmed', 'active', 'completed', 'cancelled', 'rejected', 'no_show'])
     .withMessage('Please provide a valid booking status'),
   query('date')
     .optional()
@@ -90,7 +105,7 @@ router.put('/:id/confirm', authorize('landlord'), bookingIdValidation, confirmBo
 router.put('/:id/complete', authorize('landlord'), bookingIdValidation, completeBooking);
 router.get('/:id', bookingIdValidation, getBooking);
 router.put('/:id', bookingIdValidation, updateBooking);
-router.put('/:id/cancel', bookingIdValidation, cancelBooking);
+router.put('/:id/cancel', cancelBookingValidation, cancelBooking);
 
 // Admin routes
 router.get('/', authorize('admin'), bookingListValidation, getBookings);

@@ -28,7 +28,7 @@ vi.mock('../pages/privacy', () => ({
   default: () => <div data-testid="privacy-page">Privacy Page</div>
 }))
 
-vi.mock('../pages/LandingPage/LandingPage', () => ({
+vi.mock('../pages/LandingPage/LandingPageReal', () => ({
   default: () => <div data-testid="landing-page">Landing Page</div>
 }))
 
@@ -40,7 +40,7 @@ vi.mock('../pages/CarDetails/CarDetailsReal', () => ({
   default: () => <div data-testid="car-details-page">Car Details Page</div>
 }))
 
-vi.mock('../pages/UserMyRents', () => ({
+vi.mock('../pages/UserMyRentsPage', () => ({
   default: () => <div data-testid="user-my-rents-page">User My Rents Page</div>
 }))
 
@@ -118,7 +118,7 @@ vi.mock('../pages/landlord/RentalRequests', () => ({
   default: () => <div data-testid="rental-requests-page">Rental Requests Page</div>
 }))
 
-vi.mock('../pages/landlord/Settings', () => ({
+vi.mock('../pages/landlord/SettingsReal', () => ({
   default: () => <div data-testid="landlord-settings-page">Landlord Settings Page</div>
 }))
 

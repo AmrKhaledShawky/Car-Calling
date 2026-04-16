@@ -1,6 +1,7 @@
 import { validationResult } from 'express-validator';
 import Car from '../models/Car.js';
 import Booking from '../models/Booking.js';
+import { syncCompletedStatusesForBookings } from './bookingController.js';
 
 const getActiveRentalConflict = async (carId) => Booking.exists({
   car: carId,
@@ -94,9 +95,31 @@ export const getCar = async (req, res) => {
       });
     }
 
+    const approvedBookings = await Booking.find({
+      car: car._id,
+      status: { $in: ['confirmed', 'active'] },
+      endDate: { $gte: new Date(new Date().setHours(0, 0, 0, 0)) }
+    })
+      .select('startDate endDate status')
+      .sort({ startDate: 1 });
+
+    await syncCompletedStatusesForBookings(approvedBookings);
+
+    const unavailableRanges = approvedBookings
+      .filter((booking) => ['confirmed', 'active'].includes(booking.status))
+      .map((booking) => ({
+        id: booking._id,
+        status: booking.status,
+        startDate: booking.startDate,
+        endDate: booking.endDate
+      }));
+
     res.status(200).json({
       success: true,
-      data: car
+      data: {
+        ...car.toObject({ virtuals: true }),
+        unavailableRanges
+      }
     });
   } catch (error) {
     console.error('Get car error:', error);

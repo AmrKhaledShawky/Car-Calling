@@ -1,5 +1,17 @@
 import mongoose from 'mongoose';
 
+export const BOOKING_STATUS_TRANSITIONS = Object.freeze({
+  pending: ['confirmed', 'rejected', 'cancelled'],
+  confirmed: ['active', 'completed', 'cancelled'],
+  active: ['completed', 'cancelled'],
+  completed: [],
+  cancelled: [],
+  rejected: [],
+  no_show: []
+});
+
+export const BOOKING_CANCELLATION_WINDOW_HOURS = 48;
+
 const generateBookingReference = () => {
   const date = new Date();
   const year = date.getFullYear();
@@ -90,18 +102,24 @@ const bookingSchema = new mongoose.Schema({
   // Booking status
   status: {
     type: String,
-    enum: ['pending', 'confirmed', 'active', 'completed', 'cancelled', 'no_show'],
+    enum: ['pending', 'confirmed', 'active', 'completed', 'cancelled', 'rejected', 'no_show'],
     default: 'pending'
   },
 
   // Cancellation information
   cancelledAt: Date,
+  rejectedAt: Date,
   cancellationReason: {
     type: String,
-    enum: ['customer_request', 'owner_cancelled', 'payment_failed', 'system_cancelled', 'no_show'],
+    enum: ['customer_request', 'owner_cancelled', 'owner_rejected', 'payment_failed', 'system_cancelled', 'no_show'],
     required: function() {
-      return this.status === 'cancelled';
+      return this.status === 'cancelled' || this.status === 'rejected';
     }
+  },
+  cancellationDetails: {
+    type: String,
+    trim: true,
+    maxlength: [500, 'Cancellation details cannot be more than 500 characters']
   },
   cancellationFee: {
     type: Number,
@@ -313,11 +331,12 @@ bookingSchema.methods.calculateTotal = function() {
 
 // Instance method to check if booking can be cancelled
 bookingSchema.methods.canCancel = function() {
-  const now = new Date();
-  const hoursUntilPickup = (this.startDate - now) / (1000 * 60 * 60);
+  return ['pending', 'confirmed', 'active'].includes(this.status);
+};
 
-  // Cannot cancel within 24 hours of pickup
-  return hoursUntilPickup > 24 && this.status === 'confirmed';
+bookingSchema.methods.canTransitionTo = function(nextStatus) {
+  const allowedStatuses = BOOKING_STATUS_TRANSITIONS[this.status] || [];
+  return allowedStatuses.includes(nextStatus);
 };
 
 const Booking = mongoose.model('Booking', bookingSchema);

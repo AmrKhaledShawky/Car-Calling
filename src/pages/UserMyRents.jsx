@@ -1,9 +1,12 @@
 import React, { useEffect, useState } from "react";
+import toast from "react-hot-toast";
 import { Link } from "react-router-dom";
 import Navbar from "../components/layout/Navbar";
 import Footer from "../components/layout/Footer";
 import { apiCall } from "../utils/api";
 import "./userPages.css";
+
+const CANCELLATION_WINDOW_HOURS = 48;
 
 const formatDate = (value) => {
   if (!value) return "N/A";
@@ -12,27 +15,63 @@ const formatDate = (value) => {
 
 const formatMoney = (value) => `E£ ${Number(value || 0).toFixed(2)}`;
 
+const formatLabel = (value) => {
+  if (!value) return "N/A";
+  return value.replaceAll("_", " ");
+};
+
+const canCancelBooking = (booking) => {
+  if (!booking || !["pending", "confirmed"].includes(booking.status)) {
+    return false;
+  }
+
+  const startDate = new Date(booking.startDate);
+
+  if (Number.isNaN(startDate.getTime())) {
+    return false;
+  }
+
+  return startDate.getTime() - Date.now() >= CANCELLATION_WINDOW_HOURS * 60 * 60 * 1000;
+};
+
 export default function UserMyRents() {
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [activeBookingId, setActiveBookingId] = useState("");
+
+  const loadBookings = async () => {
+    try {
+      setLoading(true);
+      setError("");
+      const response = await apiCall("/bookings/my-bookings");
+      setBookings(response.data || []);
+    } catch (fetchError) {
+      setError(fetchError.message || "Failed to load your rentals.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const loadBookings = async () => {
-      try {
-        setLoading(true);
-        setError("");
-        const response = await apiCall("/bookings/my-bookings");
-        setBookings(response.data || []);
-      } catch (fetchError) {
-        setError(fetchError.message || "Failed to load your rentals.");
-      } finally {
-        setLoading(false);
-      }
-    };
-
     loadBookings();
   }, []);
+
+  const cancelBooking = async (bookingId) => {
+    try {
+      setActiveBookingId(bookingId);
+      await apiCall(`/bookings/${bookingId}/cancel`, {
+        method: "PUT",
+        body: JSON.stringify({ reason: "customer_request" }),
+      });
+      toast.success("Booking cancelled successfully.");
+      await loadBookings();
+    } catch (requestError) {
+      toast.error(requestError.message || "Failed to cancel booking.");
+    } finally {
+      setActiveBookingId("");
+    }
+  };
 
   return (
     <div className="user-page-shell">
@@ -64,7 +103,7 @@ export default function UserMyRents() {
                     <p>{booking.bookingReference}</p>
                   </div>
                   <span className={`booking-status booking-status-${booking.status}`}>
-                    {booking.status}
+                    {formatLabel(booking.status)}
                   </span>
                 </div>
 
@@ -73,7 +112,24 @@ export default function UserMyRents() {
                   <p><strong>To:</strong> {formatDate(booking.endDate)}</p>
                   <p><strong>Total:</strong> {formatMoney(booking.totalAmount)}</p>
                   <p><strong>Owner:</strong> {booking.owner?.name || booking.owner?.email || "N/A"}</p>
+                  {booking.confirmedAt ? <p><strong>Confirmed:</strong> {formatDate(booking.confirmedAt)}</p> : null}
+                  {booking.completedAt ? <p><strong>Completed:</strong> {formatDate(booking.completedAt)}</p> : null}
+                  {booking.cancelledAt ? <p><strong>Cancelled:</strong> {formatDate(booking.cancelledAt)}</p> : null}
+                  {booking.cancellationReason ? <p><strong>Reason:</strong> {formatLabel(booking.cancellationReason)}</p> : null}
                 </div>
+
+                {canCancelBooking(booking) ? (
+                  <div className="user-card-actions">
+                    <button
+                      type="button"
+                      className="user-secondary-button"
+                      onClick={() => cancelBooking(booking._id)}
+                      disabled={activeBookingId === booking._id}
+                    >
+                      {activeBookingId === booking._id ? "Cancelling..." : "Cancel booking"}
+                    </button>
+                  </div>
+                ) : null}
               </article>
             ))}
           </div>

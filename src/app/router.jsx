@@ -4,11 +4,11 @@ import LandlordDashboard from "../pages/landlord/DashboardReal";
 import MyCars from "../pages/landlord/MyCarsReal";
 import RentalRequests from "../pages/landlord/RentalRequestsReal";
 import RentalHistory from "../pages/landlord/RentalHistoryReal";
-import Settings from "../pages/landlord/Settings";
+import Settings from "../pages/landlord/SettingsReal";
 import Profile from "../pages/landlord/Profile";
 import Register from "../pages/auth/Register";
 import Privacy from "../pages/privacy";
-import LandingPage from "../pages/LandingPage/LandingPage";
+import LandingPage from "../pages/LandingPage/LandingPageReal";
 import BrowseCars from "../pages/BrowseCar/BrowseCarReal";
 import CarDetails from "../pages/CarDetails/CarDetailsReal";
 import CarOwner from "../pages/admin/Carowner";
@@ -28,7 +28,7 @@ import Report from "../pages/admin/report";
 import ProtectedRoute from "../routes/ProtectedRoute";
 import { useAuth } from "../context/AuthContext";
 import { getAuthorizedRoute } from "../utils/auth";
-import UserMyRents from "../pages/UserMyRents";
+import UserMyRents from "../pages/UserMyRentsPage";
 import UserProfile from "../pages/UserProfile";
 
 function Router() {

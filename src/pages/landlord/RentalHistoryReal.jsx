@@ -7,6 +7,7 @@ const HISTORY_FILTERS = [
   { id: "all", label: "All History" },
   { id: "active", label: "Active" },
   { id: "confirmed", label: "Confirmed" },
+  { id: "completed", label: "Completed" },
   { id: "rejected", label: "Rejected" }
 ];
 
@@ -17,22 +18,15 @@ const formatDate = (value) => {
 
 const formatMoney = (value) => `$${Number(value || 0).toFixed(2)}`;
 
-const formatStatus = (value, booking) => {
-  if (booking.status === "cancelled" && booking.cancellationReason === "owner_cancelled") {
-    return "Rejected";
-  }
-
+const formatStatus = (value) => {
   if (!value) return "Unknown";
-  return value.charAt(0).toUpperCase() + value.slice(1);
+  return value
+    .split("_")
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(" ");
 };
 
-const getHistoryStatusClass = (booking) => {
-  if (booking.status === "cancelled" && booking.cancellationReason === "owner_cancelled") {
-    return "rejected";
-  }
-
-  return (booking.status || "unknown").toLowerCase();
-};
+const getHistoryStatusClass = (booking) => (booking.status || "unknown").toLowerCase();
 
 export default function RentalHistoryReal() {
   const [bookings, setBookings] = useState([]);
@@ -60,11 +54,10 @@ export default function RentalHistoryReal() {
   const historyBookings = useMemo(
     () =>
       bookings.filter((booking) => {
-        if (booking.status === "confirmed" || booking.status === "active") {
+        if (["confirmed", "active", "completed", "rejected"].includes(booking.status)) {
           return true;
         }
-
-        return booking.status === "cancelled" && booking.cancellationReason === "owner_cancelled";
+        return false;
       }),
     [bookings]
   );
@@ -75,17 +68,19 @@ export default function RentalHistoryReal() {
     }
 
     if (activeFilter === "active") {
-      return historyBookings.filter((booking) => ["active", "confirmed"].includes(booking.status));
+      return historyBookings.filter((booking) => booking.status === "active");
     }
 
     if (activeFilter === "confirmed") {
       return historyBookings.filter((booking) => booking.status === "confirmed");
     }
 
+    if (activeFilter === "completed") {
+      return historyBookings.filter((booking) => booking.status === "completed");
+    }
+
     if (activeFilter === "rejected") {
-      return historyBookings.filter(
-        (booking) => booking.status === "cancelled" && booking.cancellationReason === "owner_cancelled"
-      );
+      return historyBookings.filter((booking) => booking.status === "rejected");
     }
 
     return historyBookings;
@@ -95,9 +90,8 @@ export default function RentalHistoryReal() {
     () => ({
       active: historyBookings.filter((booking) => booking.status === "active").length,
       confirmed: historyBookings.filter((booking) => booking.status === "confirmed").length,
-      rejected: historyBookings.filter(
-        (booking) => booking.status === "cancelled" && booking.cancellationReason === "owner_cancelled"
-      ).length
+      completed: historyBookings.filter((booking) => booking.status === "completed").length,
+      rejected: historyBookings.filter((booking) => booking.status === "rejected").length
     }),
     [historyBookings]
   );
@@ -107,7 +101,7 @@ export default function RentalHistoryReal() {
       <div className="history-header">
         <div>
           <h2>Rental History</h2>
-          <p>Track the confirmed, active, and rejected bookings for your cars. The active view also includes already-confirmed upcoming rentals.</p>
+          <p>Track the confirmed, active, completed, and rejected bookings for your cars.</p>
         </div>
       </div>
 
@@ -124,6 +118,10 @@ export default function RentalHistoryReal() {
             <div className="history-stat-card">
               <span>Confirmed Rentals</span>
               <strong>{stats.confirmed}</strong>
+            </div>
+            <div className="history-stat-card">
+              <span>Completed Rentals</span>
+              <strong>{stats.completed}</strong>
             </div>
             <div className="history-stat-card">
               <span>Rejected Requests</span>
@@ -147,7 +145,7 @@ export default function RentalHistoryReal() {
           {filteredBookings.length === 0 ? (
             <div className="history-empty-state">
               <h3>No rentals in this section</h3>
-              <p>Once bookings are confirmed, active, or rejected, they will appear here.</p>
+              <p>Once bookings are confirmed, active, completed, or rejected, they will appear here.</p>
             </div>
           ) : (
             <div className="history-table-wrapper">
@@ -173,7 +171,7 @@ export default function RentalHistoryReal() {
                       <td>{formatMoney(booking.totalAmount)}</td>
                       <td>
                         <span className={`status ${getHistoryStatusClass(booking)}`}>
-                          {formatStatus(booking.status, booking)}
+                          {formatStatus(booking.status)}
                         </span>
                       </td>
                       <td>{formatDate(booking.updatedAt || booking.createdAt)}</td>

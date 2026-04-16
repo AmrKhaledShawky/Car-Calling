@@ -10,7 +10,8 @@
     "test": "jest",
     "seed": "node scripts/seed.js",
     "promote-admin": "node scripts/promoteToAdmin.js",
-    "set-password": "node scripts/setUserPassword.js"
+    "set-password": "node scripts/setUserPassword.js",
+    "cleanup-project-data": "node scripts/cleanupProjectData.js"
   },
   "keywords": [
     "car",
