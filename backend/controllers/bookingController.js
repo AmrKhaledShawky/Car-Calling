@@ -17,6 +17,22 @@ const BOOKING_POPULATE = [
   { path: 'owner', select: 'name email phone role' }
 ];
 
+const TERMINAL_BOOKING_STATUSES = new Set(['completed', 'cancelled', 'rejected', 'no_show']);
+const CUSTOMER_CANCELLABLE_STATUSES = new Set(['pending', 'confirmed', 'active']);
+const OWNER_CANCELLABLE_STATUSES = new Set(['pending', 'confirmed']);
+const CUSTOMER_PENALTY_STATUSES = new Set(['confirmed', 'active']);
+const COMPLETABLE_STATUSES = new Set(['confirmed', 'active']);
+const VALID_CANCELLATION_REASONS = new Set([
+  'customer_request',
+  'owner_cancelled',
+  'owner_rejected',
+  'payment_failed',
+  'system_cancelled',
+  'no_show'
+]);
+
+const COMPLETION_ELIGIBLE_STATUSES = ['confirmed', 'active'];
+
 const parsePositiveInteger = (value, fallback, { max } = {}) => {
   const parsedValue = Number.parseInt(value, 10);
 
@@ -185,6 +201,154 @@ const buildBookingResponse = (booking) => {
   };
 };
 
+export const syncCompletedStatusForBooking = (booking, now = new Date()) => {
+  if (!booking || !COMPLETION_ELIGIBLE_STATUSES.includes(booking.status)) {
+    return booking;
+  }
+
+  const bookingEndDate = booking.endDate ? new Date(booking.endDate) : null;
+
+  if (!bookingEndDate || Number.isNaN(bookingEndDate.getTime()) || bookingEndDate > now) {
+    return booking;
+  }
+
+  applyBookingStatusTransition(booking, 'completed', now);
+  return booking;
+};
+
+export const syncCompletedStatusesForBookings = async (bookings = [], now = new Date()) => {
+  const bookingsToUpdate = bookings.filter((booking) => {
+    const bookingEndDate = booking.endDate ? new Date(booking.endDate) : null;
+    return (
+      COMPLETION_ELIGIBLE_STATUSES.includes(booking.status) &&
+      bookingEndDate &&
+      !Number.isNaN(bookingEndDate.getTime()) &&
+      bookingEndDate <= now
+    );
+  });
+
+  if (bookingsToUpdate.length === 0) {
+    return bookings;
+  }
+
+  await Promise.all(bookingsToUpdate.map(async (booking) => {
+    syncCompletedStatusForBooking(booking, now);
+    await booking.save();
+  }));
+
+  return bookings;
+};
+
+const getActorContext = (booking, user) => {
+  const isCustomer = booking.customer?.toString() === user.id;
+  const isOwner = booking.owner?.toString() === user.id;
+  const isAdmin = user.role === 'admin';
+
+  return {
+    isCustomer,
+    isOwner,
+    isAdmin
+  };
+};
+
+const forbiddenMutationResponse = (res, action) => res.status(403).json({
+  success: false,
+  message: `Not authorized to ${action} this booking`
+});
+
+const conflictResponse = (res, message) => res.status(409).json({
+  success: false,
+  message
+});
+
+const validateCancellationReason = (reason, fallbackReason) => {
+  const normalizedReason = typeof reason === 'string' && reason.trim()
+    ? reason.trim()
+    : fallbackReason;
+
+  if (!VALID_CANCELLATION_REASONS.has(normalizedReason)) {
+    return {
+      error: `Cancellation reason must be one of: ${Array.from(VALID_CANCELLATION_REASONS).join(', ')}`
+    };
+  }
+
+  return { reason: normalizedReason };
+};
+
+const getCancellationEligibility = (booking, actor) => {
+  if (TERMINAL_BOOKING_STATUSES.has(booking.status)) {
+    return {
+      allowed: false,
+      message: `Booking has already been ${booking.status} and cannot be cancelled again.`
+    };
+  }
+
+  if (actor.isCustomer) {
+    if (!CUSTOMER_CANCELLABLE_STATUSES.has(booking.status)) {
+      return {
+        allowed: false,
+        message: `Customers can only cancel pending, confirmed, or active bookings. Current status is ${booking.status}.`
+      };
+    }
+  } else if (actor.isOwner) {
+    if (!OWNER_CANCELLABLE_STATUSES.has(booking.status)) {
+      return {
+        allowed: false,
+        message: `Owners can only cancel pending or confirmed bookings. Current status is ${booking.status}.`
+      };
+    }
+  } else if (actor.isAdmin) {
+    if (booking.status === 'cancelled') {
+      return {
+        allowed: false,
+        message: 'Booking is already cancelled.'
+      };
+    }
+  } else {
+    return {
+      allowed: false,
+      message: 'Not authorized to cancel this booking.'
+    };
+  }
+
+  return { allowed: true };
+};
+
+const getCustomerCancellationPenalty = (booking) => {
+  if (!CUSTOMER_PENALTY_STATUSES.has(booking.status)) {
+    return 0;
+  }
+
+  return roundCurrency(Number(booking.totalAmount || 0) * 0.1);
+};
+
+const applyBookingStatusTransition = (booking, nextStatus, timestamp = new Date()) => {
+  booking.status = nextStatus;
+
+  if (nextStatus === 'confirmed') {
+    booking.confirmedAt = booking.confirmedAt || timestamp;
+  }
+
+  if (nextStatus === 'completed') {
+    booking.completedAt = booking.completedAt || timestamp;
+    booking.returnedAt = booking.returnedAt || timestamp;
+  }
+
+  if (nextStatus === 'cancelled') {
+    booking.cancelledAt = booking.cancelledAt || timestamp;
+  }
+
+  if (nextStatus === 'rejected') {
+    booking.rejectedAt = booking.rejectedAt || timestamp;
+  }
+};
+
+const saveAndPopulateBooking = async (booking) => {
+  await booking.save();
+
+  return Booking.findById(booking._id).populate(BOOKING_POPULATE);
+};
+
 const buildFallbackLocationAddress = (car) => {
   const parts = [
     car?.location?.address,
@@ -280,6 +444,11 @@ export const getBooking = async (req, res) => {
         success: false,
         message: 'Booking not found'
       });
+    }
+
+    syncCompletedStatusForBooking(booking);
+    if (booking.isModified()) {
+      await booking.save();
     }
 
     // Check if user is authorized to see this booking
@@ -528,6 +697,11 @@ export const updateBooking = async (req, res) => {
 // Cancel booking
 export const cancelBooking = async (req, res) => {
   try {
+    const validationError = getRequestValidationError(req);
+    if (validationError) {
+      return res.status(400).json(validationError);
+    }
+
     const booking = await Booking.findById(req.params.id);
 
     if (!booking) {
@@ -538,29 +712,63 @@ export const cancelBooking = async (req, res) => {
     }
 
     // Check authorization
-    const isCustomer = booking.customer.toString() === req.user.id;
-    const isOwner = booking.owner.toString() === req.user.id;
+    const actor = getActorContext(booking, req.user);
 
-    if (!isCustomer && !isOwner && req.user.role !== 'admin') {
-      return res.status(401).json({
+    if (!actor.isCustomer && !actor.isOwner && !actor.isAdmin) {
+      return forbiddenMutationResponse(res, 'cancel');
+    }
+
+    const cancellationCheck = getCancellationEligibility(booking, actor);
+
+    if (!cancellationCheck.allowed) {
+      return conflictResponse(res, cancellationCheck.message);
+    }
+
+    const ownerActionStatus = actor.isOwner && booking.status === 'pending' ? 'rejected' : 'cancelled';
+    const defaultReason = actor.isOwner
+      ? (ownerActionStatus === 'rejected' ? 'owner_rejected' : 'owner_cancelled')
+      : actor.isAdmin
+        ? 'system_cancelled'
+        : 'customer_request';
+    const { reason, error: reasonError } = validateCancellationReason(req.body.reason, defaultReason);
+
+    if (reasonError) {
+      return res.status(400).json({
         success: false,
-        message: 'Not authorized to cancel this booking'
+        message: reasonError
       });
     }
 
-    // Check if it's too late to cancel (if implemented in model)
-    // if (!booking.canCancel()) { ... }
+    const cancellationDetails = typeof req.body.cancellationDetails === 'string'
+      ? req.body.cancellationDetails.trim()
+      : '';
 
-    booking.status = 'cancelled';
-    booking.cancelledAt = Date.now();
-    booking.cancellationReason = req.body.reason || (isCustomer ? 'customer_request' : 'owner_cancelled');
-    
-    await booking.save();
+    if (actor.isCustomer && !cancellationDetails) {
+      return res.status(400).json({
+        success: false,
+        message: 'Please tell us why you are cancelling this booking.'
+      });
+    }
+
+    const transitionTimestamp = new Date();
+    const penaltyAmount = actor.isCustomer ? getCustomerCancellationPenalty(booking) : 0;
+    const nextStatus = actor.isOwner ? ownerActionStatus : 'cancelled';
+    applyBookingStatusTransition(booking, nextStatus, transitionTimestamp);
+    booking.cancellationReason = reason;
+    booking.cancellationDetails = cancellationDetails;
+    booking.cancellationFee = penaltyAmount;
+    booking.paymentStatus = penaltyAmount > 0 ? 'paid' : 'cancelled';
+
+    const savedBooking = await saveAndPopulateBooking(booking);
 
     res.status(200).json({
       success: true,
-      message: 'Booking cancelled successfully',
-      data: booking
+      message: nextStatus === 'rejected'
+        ? 'Booking rejected successfully.'
+        : penaltyAmount > 0
+          ? `Booking cancelled successfully. A penalty of ${penaltyAmount.toFixed(2)} applies.`
+          : 'Booking cancelled successfully with no penalty.',
+      data: buildBookingResponse(savedBooking)
     });
   } catch (error) {
     res.status(500).json({
@@ -590,6 +798,8 @@ export const getMyBookings = async (req, res) => {
         message: scopedResult.error
       });
     }
+
+    await syncCompletedStatusesForBookings(scopedResult.bookings);
 
     res.status(200).json({
       success: true,
@@ -626,6 +836,8 @@ export const getOwnerBookings = async (req, res) => {
       });
     }
 
+    await syncCompletedStatusesForBookings(scopedResult.bookings);
+
     res.status(200).json({
       success: true,
       count: scopedResult.bookings.length,
@@ -644,6 +856,11 @@ export const getOwnerBookings = async (req, res) => {
 // Owner confirms a booking
 export const confirmBooking = async (req, res) => {
   try {
+    const validationError = getRequestValidationError(req);
+    if (validationError) {
+      return res.status(400).json(validationError);
+    }
+
     const booking = await Booking.findById(req.params.id);
 
     if (!booking) {
@@ -653,29 +870,29 @@ export const confirmBooking = async (req, res) => {
       });
     }
 
-    // Only owner can confirm
-    if (booking.owner.toString() !== req.user.id && req.user.role !== 'admin') {
-      return res.status(401).json({
-        success: false,
-        message: 'Not authorized to confirm this booking'
-      });
+    const actor = getActorContext(booking, req.user);
+
+    if (!actor.isOwner && !actor.isAdmin) {
+      return forbiddenMutationResponse(res, 'confirm');
     }
 
-    if (booking.status !== 'pending') {
-      return res.status(400).json({
-        success: false,
-        message: `Cannot confirm a booking that is ${booking.status}`
-      });
+    if (!booking.canTransitionTo('confirmed')) {
+      return conflictResponse(
+        res,
+        booking.status === 'confirmed'
+          ? 'Booking has already been confirmed.'
+          : `Booking cannot transition from ${booking.status} to confirmed.`
+      );
     }
 
-    booking.status = 'confirmed';
-    booking.confirmedAt = Date.now();
-    await booking.save();
+    const transitionTimestamp = new Date();
+    applyBookingStatusTransition(booking, 'confirmed', transitionTimestamp);
+    const savedBooking = await saveAndPopulateBooking(booking);
 
     res.status(200).json({
       success: true,
       message: 'Booking confirmed successfully',
-      data: booking
+      data: buildBookingResponse(savedBooking)
     });
   } catch (error) {
     res.status(500).json({
@@ -689,6 +906,11 @@ export const confirmBooking = async (req, res) => {
 // Complete a booking (car returned)
 export const completeBooking = async (req, res) => {
   try {
+    const validationError = getRequestValidationError(req);
+    if (validationError) {
+      return res.status(400).json(validationError);
+    }
+
     const booking = await Booking.findById(req.params.id);
 
     if (!booking) {
@@ -698,23 +920,31 @@ export const completeBooking = async (req, res) => {
       });
     }
 
-    // Only owner can complete (usually after receiving car back)
-    if (booking.owner.toString() !== req.user.id && req.user.role !== 'admin') {
-      return res.status(401).json({
-        success: false,
-        message: 'Not authorized to complete this booking'
-      });
+    const actor = getActorContext(booking, req.user);
+
+    if (!actor.isOwner && !actor.isAdmin) {
+      return forbiddenMutationResponse(res, 'complete');
     }
 
-    booking.status = 'completed';
-    booking.completedAt = Date.now();
-    booking.returnedAt = Date.now();
-    await booking.save();
+    if (booking.status === 'completed') {
+      return conflictResponse(res, 'Booking has already been completed.');
+    }
+
+    if (!COMPLETABLE_STATUSES.has(booking.status) || !booking.canTransitionTo('completed')) {
+      return conflictResponse(
+        res,
+        `Only active or confirmed bookings can be completed. Current status is ${booking.status}.`
+      );
+    }
+
+    const transitionTimestamp = new Date();
+    applyBookingStatusTransition(booking, 'completed', transitionTimestamp);
+    const savedBooking = await saveAndPopulateBooking(booking);
 
     res.status(200).json({
       success: true,
       message: 'Booking completed successfully',
-      data: booking
+      data: buildBookingResponse(savedBooking)
     });
   } catch (error) {
     res.status(500).json({

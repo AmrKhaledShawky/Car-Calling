@@ -15,7 +15,10 @@ const formatMoney = (value) => `$${Number(value || 0).toFixed(2)}`;
 
 const formatStatus = (value) => {
   if (!value) return "Unknown";
-  return value.charAt(0).toUpperCase() + value.slice(1);
+  return value
+    .split("_")
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(" ");
 };
 
 export default function RentalRequestsReal() {
@@ -59,7 +62,7 @@ export default function RentalRequestsReal() {
       setActiveId(id);
       await apiCall(`/bookings/${id}/cancel`, {
         method: "PUT",
-        body: JSON.stringify({ reason: "owner_cancelled" }),
+        body: JSON.stringify({ reason: "owner_rejected" }),
       });
       toast.success("Rental request rejected.");
       await loadRequests();

@@ -191,6 +191,7 @@ export const updateProfile = async (req, res) => {
       name: req.body.name,
       phone: req.body.phone,
       address: req.body.address,
+      businessName: req.body.businessName,
       dateOfBirth: req.body.dateOfBirth,
       gender: req.body.gender
     };

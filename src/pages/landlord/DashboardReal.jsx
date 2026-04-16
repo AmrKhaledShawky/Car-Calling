@@ -43,6 +43,10 @@ const buildRentalsPerCar = (bookings) => {
   const counts = new Map();
 
   bookings.forEach((booking) => {
+    if (!["confirmed", "active", "completed"].includes(booking.status)) {
+      return;
+    }
+
     const carId = booking.car?._id;
     const carName = `${booking.car?.make || ""} ${booking.car?.model || ""}`.trim() || "Unknown";
 
@@ -90,6 +94,7 @@ export default function LandlordDashboardReal() {
 
   const activeRentals = bookings.filter((booking) => ["confirmed", "active"].includes(booking.status)).length;
   const pendingRequests = bookings.filter((booking) => booking.status === "pending").length;
+  const completedRentals = bookings.filter((booking) => booking.status === "completed").length;
   const monthlyEarnings = bookings
     .filter((booking) => ["confirmed", "active", "completed"].includes(booking.status))
     .reduce((sum, booking) => sum + Number(booking.totalAmount || 0), 0);
@@ -122,6 +127,11 @@ export default function LandlordDashboardReal() {
             <div className="stat-card">
               <h3>Pending Requests</h3>
               <p>{pendingRequests}</p>
+            </div>
+
+            <div className="stat-card">
+              <h3>Completed Rentals</h3>
+              <p>{completedRentals}</p>
             </div>
           </div>
 

@@ -62,7 +62,25 @@
   font-weight: 700;
 }
 
+.user-secondary-button {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  padding: 11px 16px;
+  border-radius: 999px;
+  background: #fff4f4;
+  color: #8b0000;
+  border: 1px solid #f1c7c7;
+  cursor: pointer;
+  font-weight: 700;
+}
+
 .user-primary-button:disabled {
+  opacity: 0.7;
+  cursor: wait;
+}
+
+.user-secondary-button:disabled {
   opacity: 0.7;
   cursor: wait;
 }
@@ -74,6 +92,20 @@
 
 .user-card {
   padding: 22px;
+}
+
+.user-card-actions {
+  margin-top: 18px;
+}
+
+.user-cancel-note {
+  margin: 0 0 12px;
+  color: #555;
+  font-size: 0.92rem;
+}
+
+.user-cancel-note-warning {
+  color: #8b0000;
 }
 
 .user-card-top {
@@ -130,6 +162,11 @@
   color: #a21a1a;
 }
 
+.booking-status-rejected {
+  background: #fde8e8;
+  color: #a21a1a;
+}
+
 .booking-status-completed {
   background: #ececff;
   color: #3535a2;
@@ -167,6 +204,77 @@
   justify-self: start;
 }
 
+.user-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  z-index: 1000;
+}
+
+.user-modal-card {
+  width: min(100%, 560px);
+  background: #fff;
+  border-radius: 24px;
+  padding: 24px;
+  box-shadow: 0 24px 60px rgba(15, 23, 42, 0.2);
+}
+
+.user-modal-card h2 {
+  margin: 0 0 8px;
+  color: #1a1a1a;
+}
+
+.user-modal-card > p {
+  margin: 0 0 16px;
+  color: #666;
+}
+
+.user-modal-alert {
+  border-radius: 16px;
+  padding: 14px 16px;
+  margin-bottom: 16px;
+  font-weight: 600;
+}
+
+.user-modal-alert.warning {
+  background: #fff4e5;
+  color: #9a5b00;
+}
+
+.user-modal-alert.success {
+  background: #eaf8ee;
+  color: #1d6d37;
+}
+
+.user-modal-field {
+  display: block;
+  margin-bottom: 8px;
+  color: #444;
+  font-weight: 700;
+}
+
+.user-modal-textarea {
+  width: 100%;
+  min-height: 120px;
+  border: 1px solid #d7d7d7;
+  border-radius: 16px;
+  padding: 14px 16px;
+  resize: vertical;
+  font: inherit;
+  color: #222;
+}
+
+.user-modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 18px;
+}
+
 @media (max-width: 768px) {
   .user-card-details,
   .profile-card-form {
@@ -175,5 +283,13 @@
 
   .user-card-top {
     flex-direction: column;
+  }
+
+  .user-modal-actions {
+    flex-direction: column-reverse;
+  }
+
+  .user-modal-actions button {
+    width: 100%;
   }
 }

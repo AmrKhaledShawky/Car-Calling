@@ -108,6 +108,11 @@
   color: #175cd3;
 }
 
+.status.completed {
+  background: #ececff;
+  color: #3535a2;
+}
+
 .status.rejected {
   background: #fdecea;
   color: #c62828;
