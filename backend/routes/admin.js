@@ -7,7 +7,9 @@ import {
   updateUserStatus,
   updateCarStatus,
   getRevenueStats,
-  getSystemLogs
+  getSystemLogs,
+  getAdminProfile,
+  updateAdminProfile
 } from '../controllers/adminController.js';
 import { protect, authorize } from '../middleware/auth.js';
 
@@ -31,6 +33,9 @@ router.put('/cars/:id/status', updateCarStatus);
 
 // Booking management
 router.get('/bookings', getAllBookings);
+
+// Profile routes
+router.route('/profile').get(getAdminProfile).put(updateAdminProfile);
 
 // System routes
 router.get('/logs', getSystemLogs);

@@ -311,3 +311,84 @@ export const getSystemLogs = async (req, res) => {
     data: []
   });
 };
+export const getAdminProfile = async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id).select('-password -refreshToken -emailVerificationToken -passwordResetToken');
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'Admin profile not found'
+      });
+    }
+    res.status(200).json({
+      success: true,
+      data: user
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Failed to fetch admin profile',
+      error: error.message
+    });
+  }
+};
+
+export const updateAdminProfile = async (req, res) => {
+  try {
+    console.log('Update body:', req.body);
+    console.log('User ID:', req.user._id);
+    
+    const updates = {};
+    const allowedFields = ['name', 'phone', 'title', 'language'];
+    
+    allowedFields.forEach(field => {
+      if (req.body[field] !== undefined) {
+        updates[field] = req.body[field];
+      }
+    });
+    
+    if (req.body.password) {
+      updates.password = req.body.password;
+    }
+
+    if (Object.keys(updates).length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: 'No fields to update'
+      });
+    }
+
+const user = await User.findById(req.user._id);
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'Admin profile not found'
+      });
+    }
+    
+    // Apply updates and trigger save middleware for password hashing
+    Object.assign(user, updates);
+    await user.save();
+    
+    const updatedUser = await User.findById(req.user._id).select('-password -refreshToken -emailVerificationToken -passwordResetToken');
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'Admin profile not found'
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      data: user
+    });
+  } catch (error) {
+    console.error('UpdateAdminProfile error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to update admin profile',
+      error: error.message
+    });
+  }
+};
