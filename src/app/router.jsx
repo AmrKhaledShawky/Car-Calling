@@ -12,6 +12,7 @@ import LandingPage from "../pages/LandingPage/LandingPageReal";
 import BrowseCars from "../pages/BrowseCar/BrowseCarReal";
 import CarDetails from "../pages/CarDetails/CarDetailsReal";
 import CarOwner from "../pages/admin/Carowner";
+import Cars from "../pages/admin/Cars";
 import AddCar from "../pages/admin/addcar";
 import DeleteCar from "../pages/admin/deletecar";
 import EditCar from "../pages/admin/editcar";
@@ -22,9 +23,6 @@ import DeletePassenger from "../pages/admin/deletePassenger";
 import AdminProfile from "../pages/admin/adminProfile";
 import AdminDashboard from "../pages/admin/Admindashboard";
 import Transactions from "../pages/admin/transaction";
-import CarIssues from "../pages/admin/carIssues";
-import Review from "../pages/admin/review";
-import Report from "../pages/admin/report";
 import ProtectedRoute from "../routes/ProtectedRoute";
 import { useAuth } from "../context/AuthContext";
 import { getAuthorizedRoute } from "../utils/auth";
@@ -128,6 +126,14 @@ function Router() {
           }
         />
         <Route
+          path="/admin/cars"
+          element={
+            <ProtectedRoute allowedRoles={["admin"]}>
+              <Cars />
+            </ProtectedRoute>
+          }
+        />
+        <Route
           path="/addcar"
           element={
             <ProtectedRoute allowedRoles={["admin"]}>
@@ -204,30 +210,6 @@ function Router() {
           element={
             <ProtectedRoute allowedRoles={["admin"]}>
               <Transactions />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/admin/carissues"
-          element={
-            <ProtectedRoute allowedRoles={["admin"]}>
-              <CarIssues />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/admin/review"
-          element={
-            <ProtectedRoute allowedRoles={["admin"]}>
-              <Review />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/admin/report"
-          element={
-            <ProtectedRoute allowedRoles={["admin"]}>
-              <Report />
             </ProtectedRoute>
           }
         />

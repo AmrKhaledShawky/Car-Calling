@@ -1,6 +1,6 @@
 import { NavLink, useNavigate } from "react-router-dom";
 import { 
-  FaBars, FaTachometerAlt, FaUserFriends, FaCar, 
+  FaBars, FaTachometerAlt, FaUserFriends, FaCar, FaTaxi,
   FaExchangeAlt, FaExclamationTriangle, FaStar, FaFileAlt 
 } from "react-icons/fa";
 import { LogOut } from "lucide-react";
@@ -14,10 +14,8 @@ const AdminSidebar = ({ collapsed, setCollapsed }) => {
     { name: "Dashboard", icon: <FaTachometerAlt />, path: "/admin/dashboard" },
     { name: "Passengers", icon: <FaUserFriends />, path: "/admin/passengers" },
     { name: "Car Owners", icon: <FaCar />, path: "/admin/carowner" },
+    { name: "Cars", icon: <FaTaxi />, path: "/admin/cars" },
     { name: "Rental Transactions", icon: <FaExchangeAlt />, path: "/admin/transaction" },
-    { name: "Car Issues", icon: <FaExclamationTriangle />, path: "/admin/carissues" },
-    { name: "Review", icon: <FaStar />, path: "/admin/review" },
-    { name: "Report", icon: <FaFileAlt />, path: "/admin/report" },
   ];
 
   const handleLogout = async () => {
