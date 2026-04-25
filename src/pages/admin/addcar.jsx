@@ -2,8 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import AdminLayout from "../../components/layout/AdminLayout";
 import { apiCall } from "../../utils/api";
-import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+import { toast } from "react-toastify";
 import "./addcar.css";
 
 const AddCar = () => {
@@ -83,7 +82,6 @@ const AddCar = () => {
   return (
     <AdminLayout>
       <div className="add-car-container">
-        <ToastContainer position="top-center" autoClose={2000} />
         <h2>Add Car</h2>
         <form className="add-car-form" onSubmit={handleSubmit}>
 

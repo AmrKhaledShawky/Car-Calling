@@ -2,8 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import AdminLayout from "../../components/layout/AdminLayout";
 import { apiCall } from "../../utils/api";
-import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+import { toast } from "react-toastify";
 import "./deletecar.css";
 
 const DeleteCar = () => {
@@ -62,7 +61,6 @@ const DeleteCar = () => {
   return (
     <AdminLayout>
       <div className="delete-car-container">
-        <ToastContainer position="top-center" autoClose={2000} />
         <h2>Delete Car</h2>
         <div className="delete-car-form">
           <p>Are you sure you want to delete <strong>{carName}</strong>?</p>

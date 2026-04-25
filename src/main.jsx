@@ -5,6 +5,7 @@ import "./index.css";
 import { AuthProvider } from "./context/AuthContext";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import "./components/layout/adminToast.css";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
@@ -12,14 +13,17 @@ ReactDOM.createRoot(document.getElementById("root")).render(
       <App />
       <ToastContainer
         position="top-right"
-        autoClose={3000}
+        autoClose={2800}
         hideProgressBar={false}
-        newestOnTop={false}
+        newestOnTop
         closeOnClick
         rtl={false}
         pauseOnFocusLoss
-        draggable
+        draggable={false}
         pauseOnHover
+        toastClassName="admin-toast"
+        bodyClassName="admin-toast-body"
+        progressClassName="admin-toast-progress"
       />
     </AuthProvider>
   </React.StrictMode>

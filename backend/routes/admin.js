@@ -2,6 +2,10 @@ import express from 'express';
 import {
   getDashboardStats,
   getAllUsers,
+  getAdminUserById,
+  createAdminUser,
+  updateAdminUser,
+  deleteAdminUser,
   getAllBookings,
   getAllCars,
   updateUserStatus,
@@ -34,8 +38,14 @@ router.get('/dashboard/stats', getDashboardStats);
 router.get('/dashboard/revenue', getRevenueStats);
 
 // User management
-router.get('/users', getAllUsers);
+router.route('/users')
+  .get(getAllUsers)
+  .post(createAdminUser);
 router.put('/users/:id/status', updateUserStatus);
+router.route('/users/:id')
+  .get(getAdminUserById)
+  .put(updateAdminUser)
+  .delete(deleteAdminUser);
 
 // Landlord management
 router.get('/landlords', getLandlords);

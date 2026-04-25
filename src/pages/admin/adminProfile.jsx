@@ -4,6 +4,7 @@ import AdminLayout from "../../components/layout/AdminLayout";
 import { Check, User, Loader2 } from "lucide-react"; 
 import { toast } from "react-toastify";
 import { apiCall } from "../../utils/api.js";
+import { normalizeRole } from "../../utils/auth.js";
 import "./adminProfile.css"; 
 
 const AdminProfile = () => {
@@ -109,7 +110,7 @@ const AdminProfile = () => {
     );
   }
 
-  if (!user || user.role !== 'admin') {
+  if (!user || normalizeRole(user.role) !== 'admin') {
     return (
       <AdminLayout>
         <div className="userprofile-page">

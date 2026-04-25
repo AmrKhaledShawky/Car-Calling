@@ -2,8 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import AdminLayout from "../../components/layout/AdminLayout";
 import { apiCall } from "../../utils/api";
-import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+import { toast } from "react-toastify";
 import "./editcar.css";
 
 const EditCar = () => {
@@ -109,7 +108,6 @@ const EditCar = () => {
   return (
     <AdminLayout>
       <div className="edit-car-container">
-        <ToastContainer position="top-center" autoClose={2000} />
         <h2>Edit Car</h2>
         <form className="edit-car-form" onSubmit={handleSubmit}>
 

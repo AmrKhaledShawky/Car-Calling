@@ -1,25 +1,20 @@
 .admin-topbar {
   position: fixed;
   top: 0;
-  left: var(--admin-sidebar-width, 250px);              /* يبدأ بعد السايد بار */
-  width: calc(100% - var(--admin-sidebar-width, 250px)); /* ياخد باقي الصفحة */
-
+  left: var(--admin-sidebar-width, 250px);
+  right: 0;
+  width: auto;
   height: 70px;
-
   display: flex;
   align-items: center;
   justify-content: space-between;
-
   padding: 0 20px;
-
   background-color: rgb(204, 204, 204);
   border-bottom: 1px solid #ddd;
-
   box-sizing: border-box;
   margin: 0;
-
   z-index: 1000;
-  transition: transform 0.2s ease-in-out;
+  transition: left 0.3s ease, transform 0.2s ease-in-out;
 }
 
 .admin-topbar.hidden {
@@ -42,7 +37,7 @@
 }
 
 .admin-icon:hover {
-  color: #6B0202;
+  color: #6b0202;
 }
 
 .admin-topbar-left {

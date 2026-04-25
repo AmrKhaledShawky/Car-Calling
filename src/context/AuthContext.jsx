@@ -54,6 +54,9 @@ export const AuthProvider = ({ children }) => {
           }
         } catch (error) {
           console.error('Failed to verify token:', error);
+          if (error.status === 401 && /deactivated/i.test(error.message || '')) {
+            toast.error(error.message);
+          }
           clearAuth();
         }
       }
@@ -150,6 +153,7 @@ export const AuthProvider = ({ children }) => {
     register,
     updateProfile,
     logout,
+    clearSession: clearAuth,
     isAuthenticated: !!user,
     getAuthorizedRoute,
   };

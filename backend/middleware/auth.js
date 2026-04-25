@@ -1,6 +1,8 @@
 import jwt from 'jsonwebtoken';
 import User from '../models/User.js';
 
+const normalizeRole = (role) => (typeof role === 'string' ? role.trim().toLowerCase() : '');
+
 // Protect routes - require authentication
 export const protect = async (req, res, next) => {
   try {
@@ -41,7 +43,7 @@ export const protect = async (req, res, next) => {
       if (!user.isActive) {
         return res.status(401).json({
           success: false,
-          message: 'User account is deactivated'
+          message: 'Your account has been deactivated. Please contact the admin.'
         });
       }
 
@@ -64,6 +66,8 @@ export const protect = async (req, res, next) => {
 
 // Grant access to specific roles
 export const authorize = (...roles) => {
+  const allowedRoles = roles.map(normalizeRole);
+
   return (req, res, next) => {
     if (!req.user) {
       return res.status(401).json({
@@ -72,7 +76,9 @@ export const authorize = (...roles) => {
       });
     }
 
-    if (!roles.includes(req.user.role)) {
+    const userRole = normalizeRole(req.user.role);
+
+    if (!allowedRoles.includes(userRole)) {
       return res.status(403).json({
         success: false,
         message: `User role ${req.user.role} is not authorized to access this route`
@@ -93,7 +99,7 @@ export const ownerOrAdmin = (req, res, next) => {
   }
 
   // Admin can access everything
-  if (req.user.role === 'admin') {
+  if (normalizeRole(req.user.role) === 'admin') {
     return next();
   }
 

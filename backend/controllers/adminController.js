@@ -3,6 +3,22 @@ import Car from '../models/Car.js';
 import Booking from '../models/Booking.js';
 
 const roundCurrency = (value) => Math.round((value || 0) * 100) / 100;
+const withoutPrivateUserFields = '-password -refreshToken -emailVerificationToken -passwordResetToken';
+const USER_ROLES = ['user', 'landlord', 'admin'];
+
+const normalizeOptionalText = (value) => {
+  if (value === undefined || value === null) {
+    return undefined;
+  }
+
+  const text = String(value).trim();
+  return text || undefined;
+};
+
+const normalizeUserRole = (role, fallback = 'user') => {
+  const normalizedRole = normalizeOptionalText(role)?.toLowerCase() || fallback;
+  return USER_ROLES.includes(normalizedRole) ? normalizedRole : fallback;
+};
 
 const getLastSixMonths = () => {
   const months = [];
@@ -232,11 +248,50 @@ export const getAllCars = async (req, res) => {
 
 export const updateUserStatus = async (req, res) => {
   try {
+    if (typeof req.body.isActive !== 'boolean') {
+      return res.status(400).json({
+        success: false,
+        message: 'isActive must be true or false'
+      });
+    }
+
+    if (req.user?._id?.toString() === req.params.id && req.body.isActive === false) {
+      return res.status(400).json({
+        success: false,
+        message: 'You cannot deactivate your own admin account'
+      });
+    }
+
     const user = await User.findByIdAndUpdate(
       req.params.id,
-      { isActive: Boolean(req.body.isActive) },
+      { isActive: req.body.isActive },
       { new: true, runValidators: true }
-    ).select('-password -refreshToken -emailVerificationToken -passwordResetToken');
+    ).select(withoutPrivateUserFields);
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found'
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: `User ${user.isActive ? 'activated' : 'deactivated'} successfully`,
+      data: user
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Failed to update user status',
+      error: error.message
+    });
+  }
+};
+
+export const getAdminUserById = async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id).select(withoutPrivateUserFields);
 
     if (!user) {
       return res.status(404).json({
@@ -252,7 +307,227 @@ export const updateUserStatus = async (req, res) => {
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: 'Failed to update user status',
+      message: 'Failed to load user',
+      error: error.message
+    });
+  }
+};
+
+export const createAdminUser = async (req, res) => {
+  try {
+    const { name, email, phone, location, password, city, country, role } = req.body;
+    const trimmedName = normalizeOptionalText(name);
+    const trimmedEmail = normalizeOptionalText(email)?.toLowerCase();
+    const userRole = normalizeUserRole(role);
+
+    if (!trimmedName || !trimmedEmail || !password) {
+      return res.status(400).json({
+        success: false,
+        message: 'Name, email, and password are required'
+      });
+    }
+
+    const existingUser = await User.findOne({ email: trimmedEmail });
+    if (existingUser) {
+      return res.status(400).json({
+        success: false,
+        message: 'User with this email already exists'
+      });
+    }
+
+    const user = await User.create({
+      name: trimmedName,
+      email: trimmedEmail,
+      phone: normalizeOptionalText(phone),
+      password,
+      role: userRole,
+      isActive: true,
+      address: {
+        street: normalizeOptionalText(location) || '',
+        city: normalizeOptionalText(city) || '',
+        country: normalizeOptionalText(country) || 'USA'
+      }
+    });
+
+    const safeUser = await User.findById(user._id).select(withoutPrivateUserFields);
+
+    res.status(201).json({
+      success: true,
+      message: 'User created successfully',
+      data: safeUser
+    });
+  } catch (error) {
+    console.error('Create admin user error:', error);
+
+    if (error.name === 'ValidationError') {
+      return res.status(400).json({
+        success: false,
+        message: error.message,
+        errors: Object.values(error.errors).map((validationError) => validationError.message)
+      });
+    }
+
+    if (error.code === 11000) {
+      return res.status(400).json({
+        success: false,
+        message: 'User with this email already exists'
+      });
+    }
+
+    res.status(500).json({
+      success: false,
+      message: 'Failed to create user',
+      error: error.message
+    });
+  }
+};
+
+export const updateAdminUser = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const user = await User.findById(id);
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found'
+      });
+    }
+
+    if (req.body.name !== undefined) {
+      const name = normalizeOptionalText(req.body.name);
+      if (!name) {
+        return res.status(400).json({
+          success: false,
+          message: 'Name is required'
+        });
+      }
+      user.name = name;
+    }
+
+    if (req.body.email !== undefined) {
+      const email = normalizeOptionalText(req.body.email)?.toLowerCase();
+      if (!email) {
+        return res.status(400).json({
+          success: false,
+          message: 'Email is required'
+        });
+      }
+
+      const existingUser = await User.findOne({
+        email,
+        _id: { $ne: id }
+      });
+
+      if (existingUser) {
+        return res.status(400).json({
+          success: false,
+          message: 'User with this email already exists'
+        });
+      }
+
+      user.email = email;
+    }
+
+    if (req.body.role !== undefined) {
+      const nextRole = normalizeUserRole(req.body.role, user.role);
+      if (req.user?._id?.toString() === id && nextRole !== 'admin') {
+        return res.status(400).json({
+          success: false,
+          message: 'You cannot remove your own admin role'
+        });
+      }
+      user.role = nextRole;
+    }
+
+    if (req.body.phone !== undefined) {
+      user.phone = normalizeOptionalText(req.body.phone);
+    }
+
+    if (normalizeOptionalText(req.body.password)) {
+      user.password = req.body.password;
+    }
+
+    const hasAddressUpdate = ['location', 'city', 'country'].some((field) => req.body[field] !== undefined);
+    if (hasAddressUpdate) {
+      user.address = {
+        ...user.address?.toObject?.(),
+        street: req.body.location !== undefined
+          ? normalizeOptionalText(req.body.location) || ''
+          : user.address?.street || '',
+        city: req.body.city !== undefined
+          ? normalizeOptionalText(req.body.city) || ''
+          : user.address?.city || '',
+        country: req.body.country !== undefined
+          ? normalizeOptionalText(req.body.country) || 'USA'
+          : user.address?.country || 'USA'
+      };
+    }
+
+    await user.save();
+
+    const updatedUser = await User.findById(id).select(withoutPrivateUserFields);
+
+    res.status(200).json({
+      success: true,
+      message: 'User updated successfully',
+      data: updatedUser
+    });
+  } catch (error) {
+    console.error('Update admin user error:', error);
+
+    if (error.name === 'ValidationError') {
+      return res.status(400).json({
+        success: false,
+        message: error.message,
+        errors: Object.values(error.errors).map((validationError) => validationError.message)
+      });
+    }
+
+    if (error.code === 11000) {
+      return res.status(400).json({
+        success: false,
+        message: 'User with this email already exists'
+      });
+    }
+
+    res.status(500).json({
+      success: false,
+      message: 'Failed to update user',
+      error: error.message
+    });
+  }
+};
+
+export const deleteAdminUser = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    if (req.user?._id?.toString() === id) {
+      return res.status(400).json({
+        success: false,
+        message: 'You cannot delete your own admin account'
+      });
+    }
+
+    const user = await User.findByIdAndDelete(id);
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found'
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: 'User deleted successfully',
+      data: { id: user._id }
+    });
+  } catch (error) {
+    console.error('Delete admin user error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to delete user',
       error: error.message
     });
   }
@@ -334,6 +609,7 @@ export const getAllPassengers = async (req, res) => {
         name: user.name,
         email: user.email,
         phone: user.phone || 'N/A',
+        isActive: user.isActive !== false,
         trips: userBookings.length,
         bookingCount: userBookings.length,
         lastTrip: lastBooking?.createdAt || null,
@@ -349,7 +625,7 @@ export const getAllPassengers = async (req, res) => {
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: 'Failed to load passengers',
+      message: 'Failed to load users',
       error: error.message
     });
   }
@@ -360,12 +636,12 @@ export const getPassengerById = async (req, res) => {
     const passenger = await User.findOne({
       _id: req.params.id,
       role: 'user'
-    }).select('-password -refreshToken -emailVerificationToken -passwordResetToken');
+    }).select(withoutPrivateUserFields);
 
     if (!passenger) {
       return res.status(404).json({
         success: false,
-        message: 'Passenger not found'
+        message: 'User not found'
       });
     }
 
@@ -376,7 +652,7 @@ export const getPassengerById = async (req, res) => {
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: 'Failed to load passenger',
+      message: 'Failed to load user',
       error: error.message
     });
   }
@@ -385,15 +661,17 @@ export const getPassengerById = async (req, res) => {
 export const createPassenger = async (req, res) => {
   try {
     const { name, email, phone, location, password, city, country } = req.body;
+    const trimmedName = normalizeOptionalText(name);
+    const trimmedEmail = normalizeOptionalText(email)?.toLowerCase();
 
-    if (!name || !email || !password) {
+    if (!trimmedName || !trimmedEmail || !password) {
       return res.status(400).json({
         success: false,
         message: 'Name, email, and password are required'
       });
     }
 
-    const existingUser = await User.findOne({ email });
+    const existingUser = await User.findOne({ email: trimmedEmail });
     if (existingUser) {
       return res.status(400).json({
         success: false,
@@ -402,35 +680,51 @@ export const createPassenger = async (req, res) => {
     }
 
     const passengerData = {
-      name,
-      email,
-      phone,
+      name: trimmedName,
+      email: trimmedEmail,
+      phone: normalizeOptionalText(phone),
       password,
       role: 'user',
       isActive: true,
       address: {
-        street: location || '',
-        city: city || '',
-        country: country || 'USA'
+        street: normalizeOptionalText(location) || '',
+        city: normalizeOptionalText(city) || '',
+        country: normalizeOptionalText(country) || 'USA'
       }
     };
 
     const passenger = await User.create(passengerData);
 
     const populatedPassenger = await User.findById(passenger._id)
-      .select('-password -refreshToken -emailVerificationToken -passwordResetToken')
+      .select(withoutPrivateUserFields)
       .lean();
 
     res.status(201).json({
       success: true,
-      message: 'Passenger created successfully',
+      message: 'User created successfully',
       data: populatedPassenger
     });
   } catch (error) {
     console.error('Create passenger error:', error);
+
+    if (error.name === 'ValidationError') {
+      return res.status(400).json({
+        success: false,
+        message: error.message,
+        errors: Object.values(error.errors).map((validationError) => validationError.message)
+      });
+    }
+
+    if (error.code === 11000) {
+      return res.status(400).json({
+        success: false,
+        message: 'User with this email already exists'
+      });
+    }
+
     res.status(500).json({
       success: false,
-      message: 'Failed to create passenger',
+      message: 'Failed to create user',
       error: error.message
     });
   }
@@ -439,52 +733,104 @@ export const createPassenger = async (req, res) => {
 export const updatePassenger = async (req, res) => {
   try {
     const { id } = req.params;
-    const updates = { ...req.body };
 
     const passenger = await User.findOne({ _id: id, role: 'user' });
     if (!passenger) {
       return res.status(404).json({
         success: false,
-        message: 'Passenger not found'
+        message: 'User not found'
       });
     }
 
-    if (!updates.password) {
-      delete updates.password;
+    if (req.body.name !== undefined) {
+      const name = normalizeOptionalText(req.body.name);
+      if (!name) {
+        return res.status(400).json({
+          success: false,
+          message: 'Name is required'
+        });
+      }
+      passenger.name = name;
     }
 
-    if (updates.location !== undefined) {
-      updates.address = updates.address || {};
-      updates.address.street = updates.location;
-      delete updates.location;
-    }
-    if (updates.city !== undefined) {
-      updates.address = updates.address || {};
-      updates.address.city = updates.city;
-      delete updates.city;
-    }
-    if (updates.country !== undefined) {
-      updates.address = updates.address || {};
-      updates.address.country = updates.country;
-      delete updates.country;
+    if (req.body.email !== undefined) {
+      const email = normalizeOptionalText(req.body.email)?.toLowerCase();
+      if (!email) {
+        return res.status(400).json({
+          success: false,
+          message: 'Email is required'
+        });
+      }
+
+      const existingUser = await User.findOne({
+        email,
+        _id: { $ne: id }
+      });
+
+      if (existingUser) {
+        return res.status(400).json({
+          success: false,
+          message: 'User with this email already exists'
+        });
+      }
+
+      passenger.email = email;
     }
 
-    const updatedPassenger = await User.findByIdAndUpdate(
-      id,
-      updates,
-      { new: true, runValidators: true }
-    ).select('-password -refreshToken -emailVerificationToken -passwordResetToken');
+    if (req.body.phone !== undefined) {
+      passenger.phone = normalizeOptionalText(req.body.phone);
+    }
+
+    if (normalizeOptionalText(req.body.password)) {
+      passenger.password = req.body.password;
+    }
+
+    const hasAddressUpdate = ['location', 'city', 'country'].some((field) => req.body[field] !== undefined);
+    if (hasAddressUpdate) {
+      passenger.address = {
+        ...passenger.address?.toObject?.(),
+        street: req.body.location !== undefined
+          ? normalizeOptionalText(req.body.location) || ''
+          : passenger.address?.street || '',
+        city: req.body.city !== undefined
+          ? normalizeOptionalText(req.body.city) || ''
+          : passenger.address?.city || '',
+        country: req.body.country !== undefined
+          ? normalizeOptionalText(req.body.country) || 'USA'
+          : passenger.address?.country || 'USA'
+      };
+    }
+
+    await passenger.save();
+
+    const updatedPassenger = await User.findById(id).select(withoutPrivateUserFields);
 
     res.status(200).json({
       success: true,
-      message: 'Passenger updated successfully',
+      message: 'User updated successfully',
       data: updatedPassenger
     });
   } catch (error) {
     console.error('Update passenger error:', error);
+
+    if (error.name === 'ValidationError') {
+      return res.status(400).json({
+        success: false,
+        message: error.message,
+        errors: Object.values(error.errors).map((validationError) => validationError.message)
+      });
+    }
+
+    if (error.code === 11000) {
+      return res.status(400).json({
+        success: false,
+        message: 'User with this email already exists'
+      });
+    }
+
     res.status(500).json({
       success: false,
-      message: 'Failed to update passenger',
+      message: 'Failed to update user',
       error: error.message
     });
   }
@@ -498,20 +844,20 @@ export const deletePassenger = async (req, res) => {
     if (!passenger) {
       return res.status(404).json({
         success: false,
-        message: 'Passenger not found'
+        message: 'User not found'
       });
     }
 
     res.status(200).json({
       success: true,
-      message: 'Passenger deleted successfully',
+      message: 'User deleted successfully',
       data: { id: passenger._id }
     });
   } catch (error) {
     console.error('Delete passenger error:', error);
     res.status(500).json({
       success: false,
-      message: 'Failed to delete passenger',
+      message: 'Failed to delete user',
       error: error.message
     });
   }

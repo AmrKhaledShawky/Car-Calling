@@ -84,13 +84,13 @@ const carIdValidation = [
 router.get('/', getCars);
 router.get('/available', getAvailableCars);
 router.get('/search', searchCars);
+router.get('/owner/my-cars', protect, authorize('landlord'), getMyCars);
 router.get('/:id', carIdValidation, getCar);
 
 // Protected routes (require authentication)
 router.use(protect);
 
 // Landlord/Owner routes
-router.get('/owner/my-cars', authorize('landlord'), getMyCars);
 router.post('/', authorize('landlord'), carValidation, createCar);
 router.put('/:id', authorize('landlord'), carIdValidation, ownerOrAdmin, updateCar);
 router.delete('/:id', authorize('landlord'), carIdValidation, ownerOrAdmin, deleteCar);

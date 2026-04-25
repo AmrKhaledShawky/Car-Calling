@@ -2,6 +2,20 @@ import { validationResult } from 'express-validator';
 import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
 import User from '../models/User.js';
+import Car from '../models/Car.js';
+import Booking from '../models/Booking.js';
+
+const ACCOUNT_BLOCKING_BOOKING_STATUSES = ['pending', 'confirmed', 'active'];
+
+const getUserWithPassword = (userId) => User.findById(userId).select('+password');
+
+const getBlockingBookings = async (userId) => Booking.find({
+  $or: [
+    { customer: userId },
+    { owner: userId }
+  ],
+  status: { $in: ACCOUNT_BLOCKING_BOOKING_STATUSES }
+}).select('status bookingReference startDate endDate').limit(1);
 
 // Generate JWT token
 const generateToken = (id) => {
@@ -101,13 +115,20 @@ export const login = async (req, res) => {
 
     const { email, password } = req.body;
 
-    // Check for user
-    const user = await User.findForAuth(email);
+    // Check for user, including inactive accounts so we can show a clear status message.
+    const user = await User.findOne({ email }).select('+password');
 
     if (!user) {
       return res.status(401).json({
         success: false,
         message: 'Invalid credentials'
+      });
+    }
+
+    if (!user.isActive) {
+      return res.status(403).json({
+        success: false,
+        message: 'Your account has been deactivated. Please contact the admin.'
       });
     }
 
@@ -237,18 +258,33 @@ export const changePassword = async (req, res) => {
     }
 
     const { currentPassword, newPassword } = req.body;
+    const user = await getUserWithPassword(req.user._id);
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found'
+      });
+    }
 
     // Check current password
-    if (!(await req.user.comparePassword(currentPassword))) {
+    if (!(await user.comparePassword(currentPassword))) {
       return res.status(400).json({
         success: false,
         message: 'Current password is incorrect'
       });
     }
 
+    if (currentPassword === newPassword) {
+      return res.status(400).json({
+        success: false,
+        message: 'New password must be different from your current password'
+      });
+    }
+
     // Update password
-    req.user.password = newPassword;
-    await req.user.save();
+    user.password = newPassword;
+    await user.save();
 
     res.status(200).json({
       success: true,
@@ -256,6 +292,143 @@ export const changePassword = async (req, res) => {
     });
   } catch (error) {
     console.error('Change password error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error'
+    });
+  }
+};
+
+// @desc    Deactivate current account
+// @route   PUT /api/auth/account/deactivate
+// @access  Private
+export const deactivateAccount = async (req, res) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({
+        success: false,
+        message: 'Validation failed',
+        errors: errors.array()
+      });
+    }
+
+    const user = await getUserWithPassword(req.user._id);
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found'
+      });
+    }
+
+    if (user.role === 'admin') {
+      return res.status(403).json({
+        success: false,
+        message: 'Admin accounts cannot be deactivated from this page.'
+      });
+    }
+
+    if (!(await user.comparePassword(req.body.currentPassword))) {
+      return res.status(400).json({
+        success: false,
+        message: 'Current password is incorrect'
+      });
+    }
+
+    const blockingBookings = await getBlockingBookings(user._id);
+    if (blockingBookings.length > 0) {
+      return res.status(400).json({
+        success: false,
+        message: 'You cannot deactivate your account while you still have pending, confirmed, or active bookings.'
+      });
+    }
+
+    user.isActive = false;
+    user.refreshToken = undefined;
+    await user.save({ validateBeforeSave: false });
+
+    res.status(200).json({
+      success: true,
+      message: 'Your account has been deactivated successfully.'
+    });
+  } catch (error) {
+    console.error('Deactivate account error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error'
+    });
+  }
+};
+
+// @desc    Delete current account
+// @route   DELETE /api/auth/account
+// @access  Private
+export const deleteAccount = async (req, res) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({
+        success: false,
+        message: 'Validation failed',
+        errors: errors.array()
+      });
+    }
+
+    const user = await getUserWithPassword(req.user._id);
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found'
+      });
+    }
+
+    if (user.role === 'admin') {
+      return res.status(403).json({
+        success: false,
+        message: 'Admin accounts cannot be deleted from this page.'
+      });
+    }
+
+    if (!(await user.comparePassword(req.body.currentPassword))) {
+      return res.status(400).json({
+        success: false,
+        message: 'Current password is incorrect'
+      });
+    }
+
+    const blockingBookings = await getBlockingBookings(user._id);
+    if (blockingBookings.length > 0) {
+      return res.status(400).json({
+        success: false,
+        message: 'You cannot delete your account while you still have pending, confirmed, or active bookings.'
+      });
+    }
+
+    const ownedCars = await Car.find({ owner: user._id }).select('_id');
+    const ownedCarIds = ownedCars.map((car) => car._id);
+
+    await Booking.deleteMany({
+      $or: [
+        { customer: user._id },
+        { owner: user._id },
+        ...(ownedCarIds.length > 0 ? [{ car: { $in: ownedCarIds } }] : [])
+      ]
+    });
+
+    if (ownedCarIds.length > 0) {
+      await Car.deleteMany({ owner: user._id });
+    }
+
+    await User.findByIdAndDelete(user._id);
+
+    res.status(200).json({
+      success: true,
+      message: 'Your account has been deleted permanently.'
+    });
+  } catch (error) {
+    console.error('Delete account error:', error);
     res.status(500).json({
       success: false,
       message: 'Server error'

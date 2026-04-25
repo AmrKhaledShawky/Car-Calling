@@ -2,8 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import AdminLayout from "../../components/layout/AdminLayout";
 import { apiCall } from "../../utils/api";
-import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+import { toast } from "react-toastify";
 import "./addPassenger.css";
 
 
@@ -19,7 +18,8 @@ const AddPassenger = () => {
     location: "",
     password: "",
     city: "",
-    country: ""
+    country: "",
+    role: "user"
   });
 
   const handleChange = (e) => {
@@ -34,18 +34,18 @@ const AddPassenger = () => {
     setLoading(true);
 
     try {
-      await apiCall("/admin/passengers", {
+      await apiCall("/admin/users", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(passenger)
       });
 
-      toast.success("Passenger added successfully! ✅");
+      toast.success("User added successfully!");
       setTimeout(() => {
         navigate("/admin/passengers");
       }, 1500);
     } catch (error) {
-      toast.error("Failed to add passenger: " + (error.message || "Unknown error"));
+      toast.error("Failed to add user: " + (error.message || "Unknown error"));
     } finally {
       setLoading(false);
     }
@@ -55,8 +55,7 @@ const AddPassenger = () => {
   return (
     <AdminLayout>
       <div className="add-passenger-container">
-       <ToastContainer position="top-center" autoClose={2000} />
-      <h2>Add Passenger</h2>
+      <h2>Add User</h2>
       <form className="add-passenger-form" onSubmit={handleSubmit}>
 
         <input
@@ -65,6 +64,7 @@ const AddPassenger = () => {
           placeholder="Name"
           value={passenger.name}
           onChange={handleChange}
+          required
         />
 
         <input
@@ -73,7 +73,19 @@ const AddPassenger = () => {
           placeholder="Email"
           value={passenger.email}
           onChange={handleChange}
+          required
         />
+
+        <select
+          name="role"
+          value={passenger.role}
+          onChange={handleChange}
+          required
+        >
+          <option value="user">User</option>
+          <option value="landlord">Landlord</option>
+          <option value="admin">Admin</option>
+        </select>
 
         <input
           type="text"
@@ -97,6 +109,7 @@ const AddPassenger = () => {
           placeholder="Password"
           value={passenger.password}
           onChange={handleChange}
+          required
         />
 
         <input
@@ -117,7 +130,7 @@ const AddPassenger = () => {
 
         <div className="form-actions">
           <button type="submit" disabled={loading}>
-            {loading ? "Adding..." : "Save Passenger"}
+            {loading ? "Adding..." : "Save User"}
           </button>
         </div>
 

@@ -12,7 +12,7 @@ const AdminSidebar = ({ collapsed, setCollapsed }) => {
   const { logout } = useAuth();
   const menuItems = [
     { name: "Dashboard", icon: <FaTachometerAlt />, path: "/admin/dashboard" },
-    { name: "Passengers", icon: <FaUserFriends />, path: "/admin/passengers" },
+    { name: "Users", icon: <FaUserFriends />, path: "/admin/passengers" },
     { name: "Car Owners", icon: <FaCar />, path: "/admin/carowner" },
     { name: "Cars", icon: <FaTaxi />, path: "/admin/cars" },
     { name: "Rental Transactions", icon: <FaExchangeAlt />, path: "/admin/transaction" },

@@ -7,6 +7,8 @@ import {
   getMe,
   updateProfile,
   changePassword,
+  deactivateAccount,
+  deleteAccount,
   forgotPassword,
   resetPassword,
   refreshToken,
@@ -58,6 +60,12 @@ const changePasswordValidation = [
     .withMessage('New password must contain at least one uppercase letter, one lowercase letter, and one number')
 ];
 
+const accountActionValidation = [
+  body('currentPassword')
+    .notEmpty()
+    .withMessage('Current password is required')
+];
+
 const forgotPasswordValidation = [
   body('email')
     .isEmail()
@@ -90,6 +98,8 @@ router.use(protect); // All routes below require authentication
 router.get('/me', getMe);
 router.put('/profile', updateProfile);
 router.put('/change-password', changePasswordValidation, changePassword);
+router.put('/account/deactivate', accountActionValidation, deactivateAccount);
+router.delete('/account', accountActionValidation, deleteAccount);
 router.post('/logout', logout);
 
 export default router;

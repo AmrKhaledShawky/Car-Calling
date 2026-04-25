@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from "react";
 import AdminLayout from "../../components/layout/AdminLayout";
 import { apiCall } from "../../utils/api";
-import { ToastContainer, toast } from "react-toastify";
+import { toast } from "react-toastify";
 import { useNavigate, useParams } from "react-router-dom";
 
-import "react-toastify/dist/ReactToastify.css";
 import "./editPassenger.css"; 
 
 const EditPassenger = () => {
@@ -22,14 +21,15 @@ const EditPassenger = () => {
     location: "",
     password: "",
     city: "",
-    country: ""
+    country: "",
+    role: "user"
   });
 
   useEffect(() => {
     const fetchPassenger = async () => {
       try {
         setLoading(true);
-        const response = await apiCall(`/admin/passengers/${id}`);
+        const response = await apiCall(`/admin/users/${id}`);
         const data = response.data;
         
         setPassenger({
@@ -39,11 +39,12 @@ const EditPassenger = () => {
           location: data.address?.street || "",
           city: data.address?.city || "",
           country: data.address?.country || "",
+          role: data.role || "user",
           password: ""
         });
       } catch (err) {
-        setError("Failed to load passenger data");
-        toast.error("Failed to load passenger data");
+        setError("Failed to load user data");
+        toast.error("Failed to load user data");
       } finally {
         setLoading(false);
       }
@@ -66,18 +67,23 @@ const EditPassenger = () => {
     setError("");
 
     try {
-      await apiCall(`/admin/passengers/${id}`, {
+      const payload = { ...passenger };
+      if (!payload.password) {
+        delete payload.password;
+      }
+
+      await apiCall(`/admin/users/${id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(passenger)
+        body: JSON.stringify(payload)
       });
 
-      toast.success("Passenger updated successfully! 🔄");
+      toast.success("User updated successfully!");
       setTimeout(() => {
         navigate("/admin/passengers");
       }, 1500);
     } catch (error) {
-      const errorMsg = error.message || "Failed to update passenger";
+      const errorMsg = error.message || "Failed to update user";
       setError(errorMsg);
       toast.error(errorMsg);
     } finally {
@@ -88,9 +94,8 @@ const EditPassenger = () => {
   return (
     <AdminLayout>
       <div className="edit-passenger-container">
-        <ToastContainer position="top-right" autoClose={3000} />
-        <h2>Edit Passenger</h2>
-        {loading && <div className="loading">Loading passenger data...</div>}
+        <h2>Edit User</h2>
+        {loading && <div className="loading">Loading user data...</div>}
         {error && <div className="error">{error}</div>}
         {!loading && !error && (
       <form className="edit-passenger-form" onSubmit={handleSubmit}>
@@ -104,6 +109,7 @@ const EditPassenger = () => {
             placeholder="Name"
             value={passenger.name}
             onChange={handleChange}
+            required
           />
         </div>
 
@@ -115,7 +121,22 @@ const EditPassenger = () => {
             placeholder="Email"
             value={passenger.email}
             onChange={handleChange}
+            required
           />
+        </div>
+
+        <div className="input-wrapper">
+          <i className="fa-solid fa-user-shield"></i>
+          <select
+            name="role"
+            value={passenger.role}
+            onChange={handleChange}
+            required
+          >
+            <option value="user">User</option>
+            <option value="landlord">Landlord</option>
+            <option value="admin">Admin</option>
+          </select>
         </div>
 
         <div className="input-wrapper">
@@ -175,7 +196,7 @@ const EditPassenger = () => {
 
         <div className="form-actions">
           <button type="submit" disabled={saving || loading}>
-            {saving ? "Saving..." : "Update Passenger"}
+            {saving ? "Saving..." : "Update User"}
           </button>
         </div>
 
