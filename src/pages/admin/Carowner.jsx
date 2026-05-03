@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import AdminLayout from "../../components/layout/AdminLayout";
 import { apiCall } from "../../utils/api";
-import "./CarOwner.css";
+import "./Carowner.css";
 
 const CarOwner = () => {
   const [owners, setOwners] = useState([]);
