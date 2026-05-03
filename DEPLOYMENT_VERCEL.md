@@ -25,6 +25,12 @@ mongodb+srv://USER:PASSWORD@HOST/car-calling?retryWrites=true&w=majority&appName
 4. Keep the root directory as the repository root.
 5. Vercel will read `vercel.json` for the install command, build command, output directory, and API rewrites.
 
+The root install command includes dev dependencies because Vite is a build-time dependency:
+
+```text
+npm install --legacy-peer-deps --include=dev && npm install --prefix backend --omit=dev --legacy-peer-deps
+```
+
 ## 3. Add Environment Variables
 
 Add these in Vercel Project Settings -> Environment Variables:
