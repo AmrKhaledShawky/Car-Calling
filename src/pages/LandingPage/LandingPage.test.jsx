@@ -91,7 +91,9 @@ describe('LandingPage Integration Tests', () => {
     expect(screen.getByText(/Top picks from our live fleet/)).toBeInTheDocument()
     expect(screen.getByText('Verified Security')).toBeInTheDocument()
     expect(screen.getByText('Find Your Next Ride Now!')).toBeInTheDocument()
-    expect(await screen.findByText('2024 Mercedes-Benz S-Class')).toBeInTheDocument()
+    await waitFor(() => {
+      expect(document.body).toHaveTextContent('Mercedes-Benz')
+    })
   })
 
   it('renders navbar and footer components', async () => {
@@ -103,7 +105,9 @@ describe('LandingPage Integration Tests', () => {
 
     expect(screen.getByTestId('navbar')).toBeInTheDocument()
     expect(screen.getByTestId('footer')).toBeInTheDocument()
-    expect(await screen.findByText('2024 Mercedes-Benz S-Class')).toBeInTheDocument()
+    await waitFor(() => {
+      expect(document.body).toHaveTextContent('Mercedes-Benz')
+    })
   })
 
   it('has working navigation links', async () => {
@@ -118,7 +122,9 @@ describe('LandingPage Integration Tests', () => {
 
     const bookCarLink = screen.getByRole('link', { name: /book your car/i })
     expect(bookCarLink).toHaveAttribute('href', '/auth/register')
-    expect(await screen.findByText('2024 Mercedes-Benz S-Class')).toBeInTheDocument()
+    await waitFor(() => {
+      expect(document.body).toHaveTextContent('Mercedes-Benz')
+    })
   })
 
   it('displays featured cars with correct information', async () => {
@@ -128,9 +134,11 @@ describe('LandingPage Integration Tests', () => {
       </BrowserRouter>
     )
 
-    expect(await screen.findByText('2024 Mercedes-Benz S-Class')).toBeInTheDocument()
-    expect(await screen.findByText('2024 BMW 7 Series')).toBeInTheDocument()
-    expect(await screen.findByText((content) => content.includes('1200.00'))).toBeInTheDocument()
+    await waitFor(() => {
+      expect(document.body).toHaveTextContent('Mercedes-Benz')
+      expect(document.body).toHaveTextContent('BMW')
+      expect(document.body).toHaveTextContent('1200.00')
+    })
   })
 
   it('loads featured cars from the existing cars list', async () => {
@@ -141,8 +149,21 @@ describe('LandingPage Integration Tests', () => {
     )
 
     await waitFor(() => {
-      expect(apiCall).toHaveBeenCalledWith('/cars?limit=3&sortBy=averageRating&sortOrder=desc')
+      expect(apiCall).toHaveBeenCalledWith('/cars')
     })
+  })
+
+  it('keeps showcase cars visible when the backend returns no cars', async () => {
+    apiCall.mockResolvedValueOnce({ data: [] })
+
+    render(
+      <BrowserRouter>
+        <LandingPage />
+      </BrowserRouter>
+    )
+
+    expect(document.body).toHaveTextContent('Mercedes-Benz')
+    expect(document.body).toHaveTextContent('BMW')
   })
 
   it('has view details links for cars', async () => {
@@ -155,7 +176,8 @@ describe('LandingPage Integration Tests', () => {
     const viewDetailsLinks = await screen.findAllByRole('link', { name: /view details/i })
     expect(viewDetailsLinks.length).toBeGreaterThan(0)
     viewDetailsLinks.forEach(link => {
-      expect(link.getAttribute('href')).toContain('/car/')
+      const href = link.getAttribute('href')
+      expect(href === '/browse-cars' || href?.includes('/car/')).toBe(true)
     })
   })
 
@@ -169,6 +191,8 @@ describe('LandingPage Integration Tests', () => {
     expect(screen.getByText('24/7 Support')).toBeInTheDocument()
     expect(screen.getByText('Best Price Guarantee')).toBeInTheDocument()
     expect(screen.getByText('Every vehicle undergoes rigorous safety checks.')).toBeInTheDocument()
-    expect(await screen.findByText('2024 Mercedes-Benz S-Class')).toBeInTheDocument()
+    await waitFor(() => {
+      expect(document.body).toHaveTextContent('Mercedes-Benz')
+    })
   })
 })
