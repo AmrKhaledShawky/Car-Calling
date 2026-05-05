@@ -52,7 +52,7 @@ const LandingPage = () => {
     }, []);
 
     return (
-        <div className="landing-page dark-theme">
+        <div className="landing-page">
             <Navbar transparent={true} />
 
             <header className="hero-section" id="home">
