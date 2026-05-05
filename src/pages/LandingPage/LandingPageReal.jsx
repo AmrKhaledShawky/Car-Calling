@@ -27,6 +27,48 @@ const carouselSlides = [
     { id: 4, image: audiImg, offer: "Weekend Special" },
 ];
 
+const fallbackFeaturedCars = [
+    {
+        _id: "showcase-mercedes",
+        year: 2024,
+        make: "Mercedes-Benz",
+        model: "S-Class",
+        dailyRate: 1200,
+        category: "Luxury Sedan",
+        averageRating: 4.9,
+        fuelType: "Hybrid",
+        seats: 5,
+        images: [{ url: mercedesImg }],
+        detailsPath: "/browse-cars"
+    },
+    {
+        _id: "showcase-bmw",
+        year: 2024,
+        make: "BMW",
+        model: "7 Series",
+        dailyRate: 1100,
+        category: "Executive Sedan",
+        averageRating: 4.8,
+        fuelType: "Gasoline",
+        seats: 5,
+        images: [{ url: bmwImg }],
+        detailsPath: "/browse-cars"
+    },
+    {
+        _id: "showcase-audi",
+        year: 2024,
+        make: "Audi",
+        model: "RS 7",
+        dailyRate: 1500,
+        category: "Sports Coupe",
+        averageRating: 5,
+        fuelType: "Gasoline",
+        seats: 4,
+        images: [{ url: audiImg }],
+        detailsPath: "/browse-cars"
+    }
+];
+
 const formatCurrency = (value) => `E£ ${Number(value || 0).toFixed(2)}`;
 
 const getCarImage = (car) => car?.primaryImage?.url || car?.images?.[0]?.url || heroImg;
@@ -47,14 +89,18 @@ const staggerContainer = {
 };
 
 const LandingPageReal = () => {
-    const [featuredCars, setFeaturedCars] = useState([]);
+    const [featuredCars, setFeaturedCars] = useState(fallbackFeaturedCars);
     const [currentSlide, setCurrentSlide] = useState(0);
 
     useEffect(() => {
         const loadFeaturedCars = async () => {
             try {
-                const response = await apiCall("/cars/available");
-                setFeaturedCars((response.data || []).slice(0, 3));
+                const response = await apiCall("/cars");
+                const liveCars = (response.data || []).slice(0, 3);
+
+                if (liveCars.length > 0) {
+                    setFeaturedCars(liveCars);
+                }
             } catch (error) {
                 console.error("Failed to load featured cars:", error);
             }
@@ -146,9 +192,8 @@ const LandingPageReal = () => {
                 <motion.div 
                     className="cars-grid"
                     variants={staggerContainer}
-                    initial="hidden"
-                    whileInView="visible"
-                    viewport={{ once: true, amount: 0.1 }}
+                    initial="visible"
+                    animate="visible"
                 >
                     {featuredCars.map((car) => (
                         <motion.div className="car-card" key={car._id} variants={fadeUpVariant}>
@@ -173,7 +218,7 @@ const LandingPageReal = () => {
                                         Daily Rate<br />
                                         <span>{formatCurrency(car.dailyRate)}</span> / day
                                     </div>
-                                    <Link to={`/car/${car._id}`} className="btn-details glow-effect-sm">View Details</Link>
+                                    <Link to={car.detailsPath || `/car/${car._id}`} className="btn-details glow-effect-sm">View Details</Link>
                                 </div>
                             </div>
                         </motion.div>
