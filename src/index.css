@@ -36,4 +36,5 @@ body,
   font-family: Arial, sans-serif;
   overflow-x: hidden;
   overflow-y: auto;
+  scroll-behavior: smooth;
 }

@@ -39,8 +39,8 @@ const Navbar = ({ transparent = false }) => {
       <div className="nav-links">
         <Link to="/" className="nav-link">Home</Link>
         <Link to="/browse-cars" className="nav-link">Browse Cars</Link>
-        <a href="#about" className="nav-link">About</a>
-        <a href="#contact" className="nav-link">Contact</a>
+        <a href={location.pathname === '/' ? '#about' : '/#about'} className="nav-link">About</a>
+        <a href={location.pathname === '/' ? '#contact' : '/#contact'} className="nav-link">Contact</a>
       </div>
       <div className="nav-auth">
         {isAuthenticated ? (
