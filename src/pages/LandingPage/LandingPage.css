@@ -78,6 +78,7 @@
 .hero-image-container {
     flex: 1;
     position: relative;
+    width: 100%;
 }
 
 .hero-image-wrapper {
@@ -403,7 +404,31 @@
     }
 }
 
-@media (max-width: 768px) {}
+@media (max-width: 768px) {
+    .hero-section {
+        padding-top: 8rem;
+        min-height: auto;
+        padding-bottom: 2rem;
+    }
+
+    .hero-content h1 {
+        font-size: 2.5rem;
+    }
+
+    .hero-carousel-wrapper {
+        height: 300px;
+    }
+
+    .slide-overlay {
+        bottom: 15px;
+        left: 15px;
+    }
+
+    .offer-badge {
+        font-size: 0.8rem;
+        padding: 0.4rem 1rem;
+    }
+}
 
 /* Dark Theme Overrides & Carousel */
 .landing-page.dark-theme {

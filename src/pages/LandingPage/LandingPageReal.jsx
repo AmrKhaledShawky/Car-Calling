@@ -183,6 +183,7 @@ const LandingPageReal = () => {
 
             <motion.section 
                 className="features-section"
+                id="about"
                 variants={staggerContainer}
                 initial="hidden"
                 whileInView="visible"
