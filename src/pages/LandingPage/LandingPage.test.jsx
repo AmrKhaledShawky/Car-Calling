@@ -1,7 +1,8 @@
-import { describe, it, expect, vi } from 'vitest'
-import { render, screen } from '@testing-library/react'
+import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { render, screen, waitFor } from '@testing-library/react'
 import { BrowserRouter } from 'react-router-dom'
 import LandingPage from './LandingPageReal'
+import { apiCall } from '../../utils/api'
 
 // Mock lucide-react icons
 vi.mock('lucide-react', () => ({
@@ -74,6 +75,10 @@ vi.mock('../../utils/api', () => ({
 vi.mock('../../assets/landing/hero.png', () => ({ default: 'hero.png' }))
 
 describe('LandingPage Integration Tests', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+  })
+
   it('renders all main sections', async () => {
     render(
       <BrowserRouter>
@@ -126,6 +131,18 @@ describe('LandingPage Integration Tests', () => {
     expect(await screen.findByText('2024 Mercedes-Benz S-Class')).toBeInTheDocument()
     expect(await screen.findByText('2024 BMW 7 Series')).toBeInTheDocument()
     expect(await screen.findByText((content) => content.includes('1200.00'))).toBeInTheDocument()
+  })
+
+  it('loads featured cars from the existing cars list', async () => {
+    render(
+      <BrowserRouter>
+        <LandingPage />
+      </BrowserRouter>
+    )
+
+    await waitFor(() => {
+      expect(apiCall).toHaveBeenCalledWith('/cars?limit=3&sortBy=averageRating&sortOrder=desc')
+    })
   })
 
   it('has view details links for cars', async () => {

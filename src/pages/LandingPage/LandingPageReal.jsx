@@ -53,7 +53,7 @@ const LandingPageReal = () => {
     useEffect(() => {
         const loadFeaturedCars = async () => {
             try {
-                const response = await apiCall("/cars/available");
+                const response = await apiCall("/cars?limit=3&sortBy=averageRating&sortOrder=desc");
                 setFeaturedCars((response.data || []).slice(0, 3));
             } catch (error) {
                 console.error("Failed to load featured cars:", error);
