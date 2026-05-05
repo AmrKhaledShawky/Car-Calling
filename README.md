@@ -1,4 +1,17 @@
-# 🚗 Car Calling Platform – Frontend
+<div align="center">
+  <img src="https://capsule-render.vercel.app/api?type=waving&color=gradient&height=200&section=header&text=CAR%20CALLING%20PLATFORM&fontSize=40&fontColor=ffffff&animation=fadeIn" />
+
+  **Scalable Multi-Role Car Rental Solution** 
+
+  <a href="https://github.com/Basmala-ElKady/car-calling-frontend">
+    <img src="https://readme-typing-svg.demolab.com/?lines=REACT%20JS;ROLE-BASED%20ACCESS;CLEAN%20ARCHITECTURE;TAILWIND%20CSS&font=Fira%20Code&center=true&width=500&height=40&color=36BCF7&vCenter=true&size=24" />
+  </a>
+
+</div>
+
+---
+
+# Car Calling Platform – Frontend
 
 A multi-role car rental web application built with React.
 
@@ -8,9 +21,10 @@ This repository contains the **frontend application only**.
 
 ---
 
-## 📌 Project Overview
+## Project Overview
 
 Car Calling is a role-based car rental platform that supports:
+
 
 - Visitors (browse only)
 - Tenants (rent cars)
@@ -21,9 +35,10 @@ Car Calling is a role-based car rental platform that supports:
 
 The system is designed with scalability, modularity, and clean architecture in mind.
 
+
 ---
 
-## 🏗️ Tech Stack
+## Tech Stack
 
 - React (Vite)
 - React Router DOM
@@ -32,9 +47,12 @@ The system is designed with scalability, modularity, and clean architecture in m
 - TailwindCSS (optional styling)
 - JavaScript (ES6+)
 
+
+
+
 ---
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 src/
@@ -52,16 +70,18 @@ src/
 
 The project follows a feature-based and role-based architecture to support growth and maintainability.
 
+
+
 ---
 
-## 👥 System User Roles
+## System User Roles
 
-### 🔹 Visitor
+### Visitor
 - Browse available cars
 - View car details
 - Cannot rent cars
 
-### 🔹 Tenant
+### Tenant
 - Complete profile verification
 - Search and filter cars
 - Schedule rentals
@@ -71,18 +91,18 @@ The project follows a feature-based and role-based architecture to support growt
 - Manage rentals
 - Subscribe to premium
 
-### 🔹 Landlord
+### Landlord
 - Add cars
 - Manage listings
 - Track cars
 - Block users
 - View rental requests
 
-### 🔹 Delivery Personnel
+### Delivery Personnel
 - View assigned deliveries
 - Upload before/after delivery photos
 
-### 🔹 Admin
+### Admin
 - View analytics dashboard
 - Manage users
 - View reports
@@ -90,7 +110,7 @@ The project follows a feature-based and role-based architecture to support growt
 
 ---
 
-## 🔐 Authentication & Security
+## Authentication & Security
 
 - Role-based routing
 - Protected routes
@@ -101,22 +121,22 @@ The project follows a feature-based and role-based architecture to support growt
 
 ---
 
-## 🚀 Getting Started
+## Getting Started
 
-### 1️⃣ Clone the Repository
+### 1. Clone the Repository
 
 ```bash
 git clone https://github.com/YOUR_USERNAME/car-calling-frontend.git
 cd car-calling-frontend
 ```
 
-### 2️⃣ Install Dependencies
+### 2. Install Dependencies
 
 ```bash
 npm install
 ```
 
-### 3️⃣ Start Development Server
+### 3. Start Development Server
 
 ```bash
 npm run dev
@@ -124,18 +144,18 @@ npm run dev
 
 ---
 
-## 🛣️ Routing Structure
+## Routing Structure
 
-- `/` → Public pages
-- `/auth/*` → Authentication pages
-- `/tenant/*` → Tenant dashboard
-- `/landlord/*` → Landlord dashboard
-- `/delivery/*` → Delivery dashboard
-- `/admin/*` → Admin dashboard
+- `/` -> Public pages
+- `/auth/*` -> Authentication pages
+- `/tenant/*` -> Tenant dashboard
+- `/landlord/*` -> Landlord dashboard
+- `/delivery/*` -> Delivery dashboard
+- `/admin/*` -> Admin dashboard
 
 ---
 
-## 👨‍💻 Team Members
+## Team Members
 
 | Name                          | Role in Project |
 |-------------------------------|------------------|
@@ -147,7 +167,7 @@ npm run dev
 
 ---
 
-## 🎯 Development Roadmap
+## Development Roadmap
 
 ### Phase 1
 - Project setup
@@ -169,7 +189,7 @@ npm run dev
 
 ---
 
-## 📌 Future Improvements
+## Future Improvements
 
 - Real-time chat with WebSockets
 - Advanced analytics dashboard
@@ -179,10 +199,14 @@ npm run dev
 
 ---
 
-## 📄 License
+## License
 
 This project is for educational and development purposes.
 
 ---
 
-🔥 Built with scalability and clean architecture in mind.
+<div align="center">
+  <i>Built with scalability and clean architecture in mind.</i>
+  <br>
+  <img src="https://capsule-render.vercel.app/api?type=waving&color=gradient&height=120&section=footer" />
+</div>
