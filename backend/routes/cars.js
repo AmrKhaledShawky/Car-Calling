@@ -10,7 +10,7 @@ import {
   getAvailableCars,
   searchCars
 } from '../controllers/carController.js';
-import { protect, authorize, ownerOrAdmin } from '../middleware/auth.js';
+import { protect, authorize } from '../middleware/auth.js';
 
 const router = express.Router();
 
@@ -92,7 +92,7 @@ router.use(protect);
 
 // Landlord/Owner routes
 router.post('/', authorize('landlord'), carValidation, createCar);
-router.put('/:id', authorize('landlord'), carIdValidation, ownerOrAdmin, updateCar);
-router.delete('/:id', authorize('landlord'), carIdValidation, ownerOrAdmin, deleteCar);
+router.put('/:id', authorize('landlord'), carIdValidation, updateCar);
+router.delete('/:id', authorize('landlord'), carIdValidation, deleteCar);
 
 export default router;
