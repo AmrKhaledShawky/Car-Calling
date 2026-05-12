@@ -1,0 +1,665 @@
+.landlord-cars-page {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+}
+
+.landlord-cars-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18px;
+  padding-bottom: 18px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.landlord-cars-header-copy {
+  display: grid;
+  gap: 8px;
+}
+
+.landlord-cars-header-copy h2 {
+  margin: 0;
+  font-size: 2rem;
+  font-weight: 700;
+  color: #111827;
+}
+
+.landlord-cars-header-copy p {
+  margin: 0;
+  max-width: 760px;
+  color: #6b7280;
+  line-height: 1.55;
+}
+
+.landlord-cars-add-btn,
+.landlord-cars-primary-btn,
+.landlord-cars-secondary-btn,
+.landlord-cars-danger-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: none;
+  border-radius: 14px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.landlord-cars-add-btn,
+.landlord-cars-primary-btn {
+  min-height: 46px;
+  padding: 0 18px;
+  background: linear-gradient(135deg, #6b0202, #8b0000);
+  color: #ffffff;
+  box-shadow: 0 10px 24px rgba(107, 2, 2, 0.18);
+}
+
+.landlord-cars-secondary-btn,
+.landlord-cars-danger-btn {
+  min-height: 44px;
+  padding: 0 18px;
+}
+
+.landlord-cars-secondary-btn {
+  background: #f3f4f6;
+  color: #344054;
+}
+
+.landlord-cars-danger-btn {
+  background: #b42318;
+  color: #ffffff;
+}
+
+.landlord-cars-add-btn:hover,
+.landlord-cars-primary-btn:hover,
+.landlord-cars-secondary-btn:hover,
+.landlord-cars-danger-btn:hover {
+  transform: translateY(-1px);
+}
+
+.landlord-cars-metrics {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.landlord-cars-metric-card,
+.landlord-cars-status-card,
+.landlord-cars-empty-state {
+  background: #ffffff;
+  border: 1px solid #eceff3;
+  border-radius: 18px;
+  box-shadow: 0 10px 26px rgba(15, 23, 42, 0.05);
+}
+
+.landlord-cars-metric-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px 18px;
+}
+
+.landlord-cars-metric-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 14px;
+  background: #eef2ff;
+  color: #3730a3;
+  flex-shrink: 0;
+}
+
+.landlord-cars-metric-icon.success {
+  background: #eaf8ee;
+  color: #1f7a3f;
+}
+
+.landlord-cars-metric-icon.info {
+  background: #e7f0ff;
+  color: #155eef;
+}
+
+.landlord-cars-metric-icon.alert {
+  background: #fff4e5;
+  color: #9a5b00;
+}
+
+.landlord-cars-metric-card span {
+  display: block;
+  margin-bottom: 4px;
+  color: #667085;
+  font-size: 0.86rem;
+}
+
+.landlord-cars-metric-card strong {
+  color: #111827;
+  font-size: 1.32rem;
+  font-weight: 800;
+}
+
+.landlord-cars-status-card {
+  padding: 18px 20px;
+  color: #475467;
+}
+
+.landlord-cars-status-error {
+  color: #b42318;
+  background: #fff1f0;
+  border-color: #f4c7c3;
+}
+
+.landlord-cars-empty-state {
+  padding: 28px;
+  display: grid;
+  gap: 12px;
+  justify-items: start;
+}
+
+.landlord-cars-empty-state h3,
+.landlord-cars-empty-state p {
+  margin: 0;
+}
+
+.landlord-cars-empty-state p {
+  color: #667085;
+}
+
+.landlord-cars-table-card {
+  background: #ffffff;
+  border: 1px solid #eceff3;
+  border-radius: 22px;
+  box-shadow: 0 16px 38px rgba(15, 23, 42, 0.06);
+  overflow: hidden;
+}
+
+.landlord-cars-table-scroll {
+  width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-gutter: stable both-edges;
+}
+
+.landlord-cars-table {
+  width: 100%;
+  min-width: 1180px;
+  border-collapse: collapse;
+  table-layout: fixed;
+  font-size: 0.95rem;
+}
+
+.landlord-cars-table th,
+.landlord-cars-table td {
+  padding: 18px 16px;
+  border-bottom: 1px solid #eef2f6;
+  text-align: left;
+  vertical-align: middle;
+}
+
+.landlord-cars-table th {
+  background: #f9fafb;
+  color: #475467;
+  font-size: 0.78rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  white-space: nowrap;
+}
+
+.landlord-cars-table td {
+  color: #101828;
+  overflow-wrap: anywhere;
+}
+
+.landlord-cars-table tbody tr:hover {
+  background: #fbfcfd;
+}
+
+.landlord-cars-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.landlord-cars-table th:nth-child(1),
+.landlord-cars-table td:nth-child(1) {
+  width: 25%;
+}
+
+.landlord-cars-table th:nth-child(2),
+.landlord-cars-table td:nth-child(2) {
+  width: 12%;
+}
+
+.landlord-cars-table th:nth-child(3),
+.landlord-cars-table td:nth-child(3) {
+  width: 18%;
+}
+
+.landlord-cars-table th:nth-child(4),
+.landlord-cars-table td:nth-child(4) {
+  width: 13%;
+}
+
+.landlord-cars-table th:nth-child(5),
+.landlord-cars-table td:nth-child(5) {
+  width: 10%;
+}
+
+.landlord-cars-table th:nth-child(6),
+.landlord-cars-table td:nth-child(6) {
+  width: 12%;
+}
+
+.landlord-cars-table th:nth-child(7),
+.landlord-cars-table td:nth-child(7) {
+  width: 18%;
+}
+
+.landlord-cars-name-cell {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.landlord-cars-thumb,
+.landlord-cars-thumb-placeholder {
+  width: 64px;
+  height: 46px;
+  border-radius: 12px;
+  object-fit: cover;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.landlord-cars-thumb {
+  border: 1px solid #eadfda;
+}
+
+.landlord-cars-thumb-placeholder {
+  background: linear-gradient(135deg, #6b0202, #8b0000);
+  color: #ffffff;
+}
+
+.landlord-cars-name-copy {
+  display: grid;
+  gap: 4px;
+}
+
+.landlord-cars-name-copy strong {
+  color: #101828;
+}
+
+.landlord-cars-name-copy span {
+  color: #667085;
+  font-size: 0.88rem;
+}
+
+.landlord-cars-specs,
+.landlord-cars-status-cell {
+  display: grid;
+  gap: 4px;
+}
+
+.landlord-cars-specs {
+  color: #475467;
+  font-size: 0.88rem;
+  font-weight: 700;
+}
+
+.landlord-cars-status-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 92px;
+  padding: 8px 12px;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.landlord-cars-status-badge.available {
+  background: #e7f6ed;
+  color: #1f7a3f;
+}
+
+.landlord-cars-status-badge.maintenance {
+  background: #fff4e5;
+  color: #9a5b00;
+}
+
+.landlord-cars-status-badge.inactive,
+.landlord-cars-status-badge.unknown {
+  background: #f3f4f6;
+  color: #667085;
+}
+
+.landlord-cars-status-badge.rented {
+  background: #ffebee;
+  color: #c62828;
+}
+
+.landlord-cars-lock-note {
+  color: #9a5b00;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.landlord-cars-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  min-width: 0;
+}
+
+.landlord-cars-action-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 36px;
+  padding: 0 12px;
+  border: none;
+  border-radius: 12px;
+  font-size: 0.84rem;
+  font-weight: 700;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.landlord-cars-action-btn.edit {
+  background: #e3f2fd;
+  color: #1565c0;
+}
+
+.landlord-cars-action-btn.delete {
+  background: #ffebee;
+  color: #c62828;
+}
+
+.landlord-cars-action-btn:disabled,
+.landlord-cars-primary-btn:disabled,
+.landlord-cars-secondary-btn:disabled,
+.landlord-cars-danger-btn:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.landlord-cars-spin {
+  animation: landlord-cars-spin 0.9s linear infinite;
+}
+
+.landlord-cars-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: rgba(15, 23, 42, 0.5);
+  backdrop-filter: blur(3px);
+}
+
+.landlord-cars-modal,
+.landlord-cars-delete-modal {
+  width: min(100%, 900px);
+  background: #ffffff;
+  border-radius: 24px;
+  box-shadow: 0 28px 80px rgba(15, 23, 42, 0.24);
+}
+
+.landlord-cars-modal {
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.landlord-cars-modal-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 24px 28px 20px;
+  border-bottom: 1px solid #eceff3;
+}
+
+.landlord-cars-modal-header h3,
+.landlord-cars-modal-header p {
+  margin: 0;
+}
+
+.landlord-cars-modal-header p {
+  margin-top: 8px;
+  color: #667085;
+  line-height: 1.55;
+}
+
+.landlord-cars-close-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border: none;
+  border-radius: 999px;
+  background: #f5f7fa;
+  color: #344054;
+  cursor: pointer;
+}
+
+.landlord-cars-form {
+  padding: 24px 28px 28px;
+}
+
+.landlord-cars-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px 22px;
+}
+
+.landlord-cars-field {
+  display: flex;
+  flex-direction: column;
+}
+
+.landlord-cars-field span {
+  margin-bottom: 6px;
+  color: #344054;
+  font-size: 0.92rem;
+  font-weight: 700;
+}
+
+.landlord-cars-field input,
+.landlord-cars-field select {
+  width: 100%;
+  border: 1px solid #d0d5dd;
+  border-radius: 12px;
+  padding: 11px 13px;
+  font: inherit;
+  color: #101828;
+  background: #ffffff;
+}
+
+.landlord-cars-field input[aria-invalid="true"],
+.landlord-cars-field select[aria-invalid="true"] {
+  border-color: #d92d20;
+  background: #fff8f7;
+  box-shadow: 0 0 0 3px rgba(217, 45, 32, 0.12);
+}
+
+.landlord-cars-field small {
+  margin-top: 6px;
+  color: #667085;
+  font-size: 0.8rem;
+}
+
+.landlord-cars-field-wide,
+.landlord-cars-form-error,
+.landlord-cars-validation-list {
+  grid-column: 1 / -1;
+}
+
+.landlord-cars-pill-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.landlord-cars-pill {
+  border: 1px solid #d0d5dd;
+  background: #ffffff;
+  color: #344054;
+  border-radius: 999px;
+  padding: 10px 14px;
+  cursor: pointer;
+}
+
+.landlord-cars-pill.selected {
+  background: #6b0202;
+  border-color: #6b0202;
+  color: #ffffff;
+}
+
+.landlord-cars-preview {
+  margin-top: 12px;
+  width: 100%;
+  max-height: 260px;
+  object-fit: cover;
+  border-radius: 14px;
+  border: 1px solid #eadfda;
+}
+
+.landlord-cars-form-error {
+  margin: 0;
+  color: #b42318;
+}
+
+.landlord-cars-validation-list {
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: #fff3f2;
+  border: 1px solid #f3c7c4;
+}
+
+.landlord-cars-validation-list strong {
+  display: block;
+  margin-bottom: 8px;
+  color: #912018;
+  font-size: 0.92rem;
+}
+
+.landlord-cars-validation-list p {
+  margin: 0;
+  color: #b42318;
+  font-size: 0.9rem;
+}
+
+.landlord-cars-validation-list p + p {
+  margin-top: 6px;
+}
+
+.landlord-cars-modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 22px;
+}
+
+.landlord-cars-delete-modal {
+  width: min(100%, 520px);
+  display: grid;
+  gap: 16px;
+  padding: 28px;
+}
+
+.landlord-cars-delete-modal h3,
+.landlord-cars-delete-modal p {
+  margin: 0;
+}
+
+.landlord-cars-delete-modal p {
+  color: #667085;
+  line-height: 1.6;
+}
+
+.landlord-cars-delete-icon {
+  width: 52px;
+  height: 52px;
+  border-radius: 18px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #fff1f0;
+  color: #b42318;
+}
+
+.landlord-cars-delete-summary {
+  display: grid;
+  gap: 8px;
+  padding: 16px;
+  border-radius: 18px;
+  border: 1px solid #eceff3;
+  background: #f9fafb;
+}
+
+@keyframes landlord-cars-spin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 1100px) {
+  .landlord-cars-metrics {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 768px) {
+  .landlord-cars-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .landlord-cars-add-btn {
+    width: 100%;
+  }
+
+  .landlord-cars-metrics {
+    grid-template-columns: 1fr;
+  }
+
+  .landlord-cars-table {
+    min-width: 980px;
+  }
+
+  .landlord-cars-form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .landlord-cars-modal,
+  .landlord-cars-delete-modal {
+    border-radius: 20px;
+  }
+
+  .landlord-cars-modal-actions {
+    flex-direction: column-reverse;
+  }
+
+  .landlord-cars-secondary-btn,
+  .landlord-cars-danger-btn,
+  .landlord-cars-primary-btn {
+    width: 100%;
+  }
+}

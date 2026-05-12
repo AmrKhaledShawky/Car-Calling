@@ -85,7 +85,18 @@ backend/
 4. **Start MongoDB**
    Make sure MongoDB is running on your system.
 
-5. **Run the server**
+5. **Initialize the database schema**
+   ```bash
+   npm run init-db
+   ```
+   This creates the `users`, `cars`, and `bookings` collections and their indexes from the Mongoose models.
+
+6. **Optional: add sample data**
+   ```bash
+   npm run seed
+   ```
+
+7. **Run the server**
    ```bash
    # Development mode with auto-restart
    npm run dev
@@ -94,7 +105,7 @@ backend/
    npm start
    ```
 
-The server will start on `http://localhost:5000` (or your configured PORT).
+The server will start on `http://localhost:5001` (or your configured PORT).
 
 ## 🔧 Environment Variables
 
@@ -103,7 +114,7 @@ Create a `.env` file in the backend root with the following variables:
 ```env
 # Environment
 NODE_ENV=development
-PORT=5000
+PORT=5001
 
 # Database
 MONGODB_URI=mongodb://localhost:27017/car-calling

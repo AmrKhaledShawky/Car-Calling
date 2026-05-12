@@ -1,97 +1,115 @@
 import express from 'express';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 import cors from 'cors';
 import helmet from 'helmet';
 import compression from 'compression';
-import morgan from 'morgan';
 import rateLimit from 'express-rate-limit';
-import dotenv from 'dotenv';
-import connectDB from './config/database.js';
 
-// Import routes
-import authRoutes from './routes/auth.js';
-import carRoutes from './routes/cars.js';
-import userRoutes from './routes/users.js';
-import bookingRoutes from './routes/bookings.js';
-import adminRoutes from './routes/admin.js';
+import config from './src/config/env.config.js';
+import connectDB from './src/config/database.js';
 
-// Load environment variables
-dotenv.config({ path: './.env' });
-console.log('JWT_SECRET loaded:', process.env.JWT_SECRET ? 'YES' : 'NO');
+import errorMiddleware from './src/middleware/error.middleware.js';
 
-const isProduction = process.env.NODE_ENV === 'production';
-const isVercel = Boolean(process.env.VERCEL);
+import ApiError from './src/utils/ApiError.js';
+import ApiResponse from './src/utils/ApiResponse.js';
+import asyncHandler from './src/utils/asyncHandler.js';
+import logger, { requestLogger } from './src/utils/logger.js';
+
+process.on('uncaughtException', (err) => {
+  logger.error({ err }, 'UNCAUGHT EXCEPTION! Shutting down...');
+  process.exit(1);
+});
+
+process.on('unhandledRejection', (err) => {
+  logger.error({ err }, 'UNHANDLED REJECTION! Shutting down...');
+  process.exit(1);
+});
+
+import authRoutes from './src/routes/auth.js';
+import carRoutes from './src/routes/cars.js';
+import userRoutes from './src/routes/users.js';
+import bookingRoutes from './src/routes/bookings.js';
+import adminRoutes from './src/routes/admin.js';
+import ownerRoutes from './src/routes/owner.js';
+import privateRoutes from './src/routes/private.js';
+import publicRoutes from './src/routes/public.js';
+
+logger.info({ loaded: config.jwt.wasSecretProvided }, 'JWT_SECRET loaded');
+
+const isVercel = config.isVercel;
 
 // Development fallbacks for missing JWT secrets
-if (!process.env.JWT_SECRET && !isProduction) {
-  process.env.JWT_SECRET = 'your-super-secret-jwt-key-change-this-in-production';
-  console.log('Set JWT_SECRET manually');
+if (config.jwt.usesDefaultSecret) {
+  logger.warn('Using development fallback JWT_SECRET');
 }
 
-if (!process.env.JWT_REFRESH_SECRET && !isProduction) {
-  process.env.JWT_REFRESH_SECRET = 'your-super-secret-refresh-key-change-this-in-production';
-  console.log('Set JWT_REFRESH_SECRET manually');
+if (config.jwt.usesDefaultRefreshSecret) {
+  logger.warn('Using development fallback JWT_REFRESH_SECRET');
 }
 
-if (!process.env.JWT_SECRET || !process.env.JWT_REFRESH_SECRET) {
+if (!config.jwt.secret || !config.jwt.refreshSecret) {
   throw new Error('JWT_SECRET and JWT_REFRESH_SECRET must be set');
 }
 
 const app = express();
-const PORT = process.env.PORT || 5001;
+app.use(requestLogger);
+const PORT = config.port;
+
+// Add server info to app.locals for URL generation
+app.locals.serverUrl = process.env.SERVER_URL || `http://localhost:${PORT}`;
 
 app.set('trust proxy', 1);
+
 
 // Security middleware
 app.use(helmet());
 
 // Rate limiting
-const limiter = rateLimit({
+const apiLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // limit each IP to 100 requests per windowMs
-  message: 'Too many requests from this IP, please try again later.'
+  max: 1000, // Increased for development
+  message: 'Too many requests from this IP, please try again later.',
+  standardHeaders: true,
+  legacyHeaders: false
 });
-app.use(limiter);
+
+app.use('/api', apiLimiter);
 
 // CORS configuration
 const corsOptions = {
-  origin: process.env.FRONTEND_URL || 'http://localhost:5173',
+  origin: config.frontendUrl,
   credentials: true,
   optionsSuccessStatus: 200
 };
 app.use(cors(corsOptions));
 
 // Body parsing middleware
-app.use(express.json({ limit: '10mb' }));
-app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+app.use(express.json({ limit: config.bodyLimit }));
+app.use(express.urlencoded({ extended: true, limit: config.bodyLimit }));
 
 // Compression middleware
 app.use(compression());
 
-// Logging middleware
-if (process.env.NODE_ENV === 'development') {
-  app.use(morgan('dev'));
-} else {
-  app.use(morgan('combined'));
-}
+// Static files
+app.use('/uploads', express.static(path.join(__dirname, 'src/uploads')));
 
-const ensureDatabase = async (req, res, next) => {
-  try {
-    await connectDB();
-    next();
-  } catch (error) {
-    next(error);
-  }
-};
+const ensureDatabase = asyncHandler(async (req, res, next) => {
+  await connectDB();
+  return next();
+});
 
 app.use('/api', ensureDatabase);
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {
-  res.status(200).json({
+  return ApiResponse.success(res, null, 'Car Calling API is running', 200, {
     status: 'OK',
-    message: 'Car Calling API is running',
     timestamp: new Date().toISOString(),
-    environment: process.env.NODE_ENV || 'development'
+    environment: config.nodeEnv
   });
 });
 
@@ -117,78 +135,36 @@ app.use('/api', (req, res, next) => {
 app.use('/api/cars', carRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/bookings', bookingRoutes);
+app.use('/api/public', publicRoutes);
+app.use('/api/private', privateRoutes);
+app.use('/api/owner', ownerRoutes);
 app.use('/api/admin', adminRoutes);
 
 // 404 handler
-app.use('*', (req, res) => {
-  res.status(404).json({
-    success: false,
-    message: 'Route not found'
-  });
+app.use('*', (req, res, next) => {
+  next(new ApiError(404, 'Route not found'));
 });
 
-// Global error handler
-app.use((err, req, res, next) => {
-  console.error('Error:', err);
-
-  // Mongoose validation error
-  if (err.name === 'ValidationError') {
-    const errors = Object.values(err.errors).map(e => e.message);
-    return res.status(400).json({
-      success: false,
-      message: 'Validation Error',
-      errors
-    });
-  }
-
-  // Mongoose duplicate key error
-  if (err.code === 11000) {
-    const field = Object.keys(err.keyValue)[0];
-    return res.status(400).json({
-      success: false,
-      message: `${field} already exists`
-    });
-  }
-
-  // JWT errors
-  if (err.name === 'JsonWebTokenError') {
-    return res.status(401).json({
-      success: false,
-      message: 'Invalid token'
-    });
-  }
-
-  if (err.name === 'TokenExpiredError') {
-    return res.status(401).json({
-      success: false,
-      message: 'Token expired'
-    });
-  }
-
-  // Default error
-  res.status(err.status || 500).json({
-    success: false,
-    message: err.message || 'Internal server error',
-    ...(process.env.NODE_ENV === 'development' && { stack: err.stack })
-  });
-});
+app.use(errorMiddleware);
 
 const startServer = async () => {
   try {
     await connectDB();
 
     app.listen(PORT, () => {
-      console.log(`Car Calling API server running on port ${PORT}`);
-      console.log(`Frontend URL: ${process.env.FRONTEND_URL || 'http://localhost:5173'}`);
-      console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
+      logger.info({
+        port: PORT,
+        frontendUrl: config.frontendUrl,
+        environment: config.nodeEnv
+      }, 'Car Calling API server started');
     });
   } catch (error) {
-    console.error('Failed to start server:', error.message);
+    logger.error({ err: error }, 'Failed to start server');
     process.exit(1);
   }
 };
 
-if (!isVercel) {
+if (!isVercel && process.env.NODE_ENV !== 'test') {
   startServer();
 }
 

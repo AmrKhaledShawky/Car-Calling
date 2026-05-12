@@ -1,0 +1,100 @@
+.add-car-container {
+  max-width: 600px;
+  margin: 40px auto;
+  padding: 30px;
+  background-color: white;
+  border-radius: 12px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+  font-family: 'Arial', sans-serif;
+}
+
+.add-car-container h2 {
+  text-align: center;
+  margin-bottom: 25px;
+  color: #000;
+}
+
+.add-car-form input,
+.add-car-form select,
+.add-car-form textarea {
+  width: 100%;
+  padding: 12px 15px;
+  margin-bottom: 18px;
+  border: 1px solid #6B0202;
+  border-radius: 8px;
+  font-size: 14px;
+  transition: all 0.2s ease;
+}
+
+.add-car-form input:focus,
+.add-car-form select:focus,
+.add-car-form textarea:focus {
+  border-color: #6B0202;
+  outline: none;
+}
+
+.add-car-form input[aria-invalid="true"],
+.add-car-form select[aria-invalid="true"],
+.add-car-form textarea[aria-invalid="true"] {
+  border-color: #d92d20;
+  background: #fff8f7;
+  box-shadow: 0 0 0 3px rgba(217, 45, 32, 0.12);
+}
+
+.add-car-form textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+.add-car-validation-list {
+  margin-bottom: 18px;
+  padding: 12px 14px;
+  border-radius: 8px;
+  border: 1px solid #f3c7c4;
+  background: #fff3f2;
+}
+
+.add-car-validation-list strong {
+  display: block;
+  margin-bottom: 8px;
+  color: #912018;
+  font-size: 0.92rem;
+}
+
+.add-car-validation-list p {
+  margin: 0;
+  color: #b42318;
+  font-size: 0.9rem;
+}
+
+.add-car-validation-list p + p {
+  margin-top: 6px;
+}
+
+.add-car-form .form-actions {
+  text-align: center;
+  margin-top: 20px;
+}
+
+.add-car-form button {
+  background-color: #6B0202;
+  color: #fff;
+  padding: 12px 35px;
+  font-size: 16px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.add-car-form button:hover {
+  background-color: #e74c3c;
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+  .add-car-container {
+    margin: 20px;
+    padding: 20px;
+  }
+}
