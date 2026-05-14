@@ -1,212 +1,102 @@
 <div align="center">
   <img src="https://capsule-render.vercel.app/api?type=waving&color=gradient&height=200&section=header&text=CAR%20CALLING%20PLATFORM&fontSize=40&fontColor=ffffff&animation=fadeIn" />
 
-  **Scalable Multi-Role Car Rental Solution** 
+  **Scalable Full-Stack Car Rental Solution** 
 
-  <a href="https://github.com/Basmala-ElKady/car-calling-frontend">
-    <img src="https://readme-typing-svg.demolab.com/?lines=REACT%20JS;ROLE-BASED%20ACCESS;CLEAN%20ARCHITECTURE;TAILWIND%20CSS&font=Fira%20Code&center=true&width=500&height=40&color=36BCF7&vCenter=true&size=24" />
+  <a href="https://github.com/Basmala-ElKady">
+    <img src="https://readme-typing-svg.demolab.com/?lines=MERN%20STACK;ROLE-BASED%20ACCESS;LAYERED%20ARCHITECTURE;DOCKER%20READY&font=Fira%20Code&center=true&width=500&height=40&color=36BCF7&vCenter=true&size=24" />
   </a>
-
 </div>
 
 ---
 
-# Car Calling Platform – Frontend
+# Car Calling Platform
 
-A multi-role car rental web application built with React.
-
-This platform allows tenants to rent cars, landlords to list vehicles, delivery personnel to manage deliveries, and admins to manage the entire system.
-
-This repository contains the **frontend application only**.
+A comprehensive **Full-Stack** car rental ecosystem designed for high scalability and secure role-based operations. The platform bridges the gap between car owners (**Landlords**) and renters (**Tenants**) with dedicated modules for **Delivery** and **Admin** management.
 
 ---
 
-## Project Overview
+## System Architecture
 
-Car Calling is a role-based car rental platform that supports:
+This project follows a **Layered Architecture** (Clean Architecture principles) to ensure separation of concerns and ease of testing.
 
+### Backend (Node.js & Express)
+The backend is structured into distinct layers:
+- **Routes:** API endpoint definitions.
+- **Middlewares:** Authentication (JWT), Authorization (RBAC), and Request Validation.
+- **Controllers:** Orchestrating the flow between requests and services.
+- **Services:** Housing the core **Business Logic** (Pricing, Booking Rules, Status Management).
+- **Models:** MongoDB schemas with Mongoose for data persistence.
 
-- Visitors (browse only)
-- Tenants (rent cars)
-- Landlords (list cars)
-- Delivery Personnel
-- Admins
-- Premium Users
-
-The system is designed with scalability, modularity, and clean architecture in mind.
-
+### Frontend (React & Vite)
+- **State Management:** Context API for Global Auth & User Roles.
+- **Routing:** Protected routes based on user permissions.
+- **UI:** Modular component structure for high reusability.
 
 ---
 
 ## Tech Stack
 
-- React (Vite)
-- React Router DOM
-- Context API (Authentication & Role Management)
-- Axios (API communication)
-- TailwindCSS (optional styling)
-- JavaScript (ES6+)
-
-
-
+| Layer | Technology |
+|---|---|
+| **Frontend** | React (Vite), React Router, Axios, TailwindCSS |
+| **Backend** | Node.js, Express.js |
+| **Database** | MongoDB with Mongoose |
+| **DevOps** | Docker, Docker Compose |
+| **Tools** | Postman (API Testing), Git/GitHub |
 
 ---
 
-## Project Structure
+## User Roles & Features
 
-```
-src/
-│
-├── app/
-├── assets/
-├── components/
-├── context/
-├── hooks/
-├── pages/
-├── routes/
-├── services/
-└── utils/
-```
+### Tenant (Renter)
+- **Smart Booking:** Real-time availability check and price calculation.
+- **Verification:** Mandatory profile verification before renting.
+- **Condition Logs:** Upload car photos before/after rental.
 
-The project follows a feature-based and role-based architecture to support growth and maintainability.
-
-
-
----
-
-## System User Roles
-
-### Visitor
-- Browse available cars
-- View car details
-- Cannot rent cars
-
-### Tenant
-- Complete profile verification
-- Search and filter cars
-- Schedule rentals
-- Apply promo codes
-- Upload car condition photos (before/after)
-- Chat with car owners
-- Manage rentals
-- Subscribe to premium
-
-### Landlord
-- Add cars
-- Manage listings
-- Track cars
-- Block users
-- View rental requests
+### Landlord (Owner)
+- **Fleet Management:** Add/Edit cars and track their rental status.
+- **User Control:** Ability to block problematic users from renting their cars.
 
 ### Delivery Personnel
-- View assigned deliveries
-- Upload before/after delivery photos
+- **Task Management:** View assigned car delivery tasks.
+- **Visual Proof:** Upload handover photos for security.
 
 ### Admin
-- View analytics dashboard
-- Manage users
-- View reports
-- Send system notifications
-
----
-
-## Authentication & Security
-
-- Role-based routing
-- Protected routes
-- Password complexity validation
-- Account lock after multiple failed login attempts
-- Verification required before renting or listing cars
-- Payment method required before rental
+- **Analytics:** Dashboard for system-wide performance and reports.
+- **Governance:** Manage users, car listings, and system notifications.
 
 ---
 
 ## Getting Started
 
-### 1. Clone the Repository
+### Prerequisites
+- Node.js installed
+- Docker (Optional for containerized setup)
 
-```bash
-git clone https://github.com/YOUR_USERNAME/car-calling-frontend.git
-cd car-calling-frontend
-```
+### Setup & Installation
 
-### 2. Install Dependencies
+1. **Clone the repository:**
+   ```bash
+   git clone https://github.com/AmrKhaledShawky/Car-Calling.git
 
-```bash
-npm install
-```
+2. **Backend Setup:**
+    ```bash
+    cd backend
+    npm install
+    # Create .env file with your MONGO_URI and JWT_SECRET
+    npm start
 
-### 3. Start Development Server
-
-```bash
-npm run dev
-```
-
----
-
-## Routing Structure
-
-- `/` -> Public pages
-- `/auth/*` -> Authentication pages
-- `/tenant/*` -> Tenant dashboard
-- `/landlord/*` -> Landlord dashboard
-- `/delivery/*` -> Delivery dashboard
-- `/admin/*` -> Admin dashboard
-
----
-
-## Team Members
-
-| Name                          | Role in Project |
-|-------------------------------|------------------|
-| Amr Khaled Mohamed Shawky     | __________________________ |
-| Maryam Gomaa                  | __________________________ |
-| Hoda Mahmoud                  | __________________________ |
-| Jowairya Kassem               | __________________________ |
-| Basmala Elkady                | __________________________ |
-
----
-
-## Development Roadmap
-
-### Phase 1
-- Project setup
-- Routing structure
-- Authentication UI
-
-### Phase 2
-- Car browsing
-- Tenant rental flow
-
-### Phase 3
-- Landlord dashboard
-- Admin panel
-
-### Phase 4
-- Chat system
-- Delivery system
-- Premium features
-
----
-
-## Future Improvements
-
-- Real-time chat with WebSockets
-- Advanced analytics dashboard
-- Payment integration (Stripe/PayPal)
-- Mobile responsiveness optimization
-- Progressive Web App (PWA) support
-
----
-
-## License
-
-This project is for educational and development purposes.
+3. **Frontend Setup:**
+    ```bash
+    cd frontend
+    npm install
+    npm run dev
 
 ---
 
 <div align="center">
-  <i>Built with scalability and clean architecture in mind.</i>
+  <i>Developed with precision and clean code principles.</i>
   <br>
   <img src="https://capsule-render.vercel.app/api?type=waving&color=gradient&height=120&section=footer" />
 </div>
