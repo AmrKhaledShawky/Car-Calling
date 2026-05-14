@@ -49,12 +49,12 @@ The backend is structured into distinct layers:
 
 ## User Roles & Features
 
-### Tenant (Renter)
+### Renter
 - **Smart Booking:** Real-time availability check and price calculation.
 - **Verification:** Mandatory profile verification before renting.
 - **Condition Logs:** Upload car photos before/after rental.
 
-### Landlord (Owner)
+### Owner
 - **Fleet Management:** Add/Edit cars and track their rental status.
 - **User Control:** Ability to block problematic users from renting their cars.
 
